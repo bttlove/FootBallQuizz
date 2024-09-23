@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "675886555859",
+    "project_id": "footballquizz-4c19c",
+    "storage_bucket": "footballquizz-4c19c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:675886555859:android:3a35a8ebb3c06615d76a26",
+        "android_client_info": {
+          "package_name": "com.example.footballquizz"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVTqbEI0762pJprlN-UWfPYgZ_KhjIpdE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

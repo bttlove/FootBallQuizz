@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:ignore="ExtraText"
     android:fitsSystemWindows="true">
-   <!-- tools:context="info.androidhive.firebase.LoginActivity"-->>
+    <!-- tools:context="info.androidhive.firebase.LoginActivity"-->>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -25,7 +25,9 @@
             android:textSize="24sp"
             android:textStyle="bold"
 
+
             android:textColor="@android:color/white"
+
             android:layout_gravity="center_horizontal" />
 
         <androidx.appcompat.widget.Toolbar

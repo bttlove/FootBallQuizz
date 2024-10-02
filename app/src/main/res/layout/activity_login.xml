@@ -24,14 +24,15 @@
             android:text="Quiz Football App"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+
+            android:textColor="@android:color/white"
             android:layout_gravity="center_horizontal" />
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+
             />
         <!-- Logo -->
         <ImageView

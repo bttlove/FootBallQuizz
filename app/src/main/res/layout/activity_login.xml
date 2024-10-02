@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     tools:ignore="ExtraText"
     android:fitsSystemWindows="true">
-   <!-- tools:context="info.androidhive.firebase.LoginActivity"-->>
+    <!-- tools:context="info.androidhive.firebase.LoginActivity"-->>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,14 +24,15 @@
             android:text="Quiz Football App"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"
+
+            android:textColor="@android:color/holo_red_dark"
             android:layout_gravity="center_horizontal" />
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+
             />
         <!-- Logo -->
         <ImageView

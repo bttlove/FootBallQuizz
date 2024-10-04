@@ -26,9 +26,9 @@ class LoginActivity :  AppCompatActivity() {
         // Get Firebase auth instance
         auth = FirebaseAuth.getInstance()
 
-        // Nếu người dùng đã đăng nhập, chuyển tiếp sang MainActivity
+        // Nếu người dùng đã đăng nhập, chuyển tiếp sang
         if (auth.currentUser != null) {
-            startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+            startActivity(Intent(this@LoginActivity, QuizActivity::class.java))
             finish()
         }
 

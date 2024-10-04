@@ -85,11 +85,13 @@ class LoginActivity :  AppCompatActivity() {
                             Toast.makeText(this@LoginActivity, getString(R.string.auth_failed), Toast.LENGTH_LONG).show()
                         }
                     } else {
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        // Chuyển sang HomePageActivity
+                        val intent = Intent(this@LoginActivity, HomePageActivity::class.java)
                         startActivity(intent)
-                        finish()
+                        finish() // Đóng LoginActivity
                     }
                 }
         }
+
     }
 }

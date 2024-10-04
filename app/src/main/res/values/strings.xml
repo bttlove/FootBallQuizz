@@ -29,5 +29,15 @@
     <string name="lbl_forgot_password">Forgot password?</string>
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="prompt_password">Enter your password</string>
+    <string name="greeting_text">Hi, User</string>
+    <string name="rank_text">RANK</string>
+    <string name="point_text">Point</string>
+    <string name="profile_icon_description">Profile Icon</string>
+    <string name="lets_play_text">Let Play</string>
+    <string name="easy_button_text">Easy</string>
+    <string name="random_button_text">Random</string>
+    <string name="hard_button_text">Hard</string>
+    <string name="normal_button_text">Normal</string>
+
 
 </resources>

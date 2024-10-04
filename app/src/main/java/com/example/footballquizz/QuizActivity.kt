@@ -3,6 +3,7 @@ import android.os.Bundle
 import android.content.Intent
 import android.widget.Button
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
@@ -14,7 +15,7 @@ class QuizActivity : AppCompatActivity() {
     private lateinit var btnAnswer2: Button
     private lateinit var btnAnswer3: Button
     private lateinit var btnAnswer4: Button
-
+    private lateinit var ivPlayerImage: ImageView
     private lateinit var players: List<QuizzModel> // Danh sách cầu thủ
     private lateinit var correctAnswer: String // Đáp án đúng
     private var difficulty: String? = null
@@ -28,6 +29,7 @@ class QuizActivity : AppCompatActivity() {
         btnAnswer2 = findViewById(R.id.btnAnswer2)
         btnAnswer3 = findViewById(R.id.btnAnswer3)
         btnAnswer4 = findViewById(R.id.btnAnswer4)
+
 
         // Nhận độ khó từ Intent
         difficulty = intent.getStringExtra("DIFFICULTY")

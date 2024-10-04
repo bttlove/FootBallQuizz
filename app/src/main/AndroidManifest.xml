@@ -30,6 +30,11 @@
         <!-- Khai báo LoginActivity -->
         <activity android:name=".LoginActivity"
             android:exported="true"/>
+        <activity android:name=".DifficultySelectionActivity"
+            android:exported="true"/>
+
+        <activity android:name=".QuizActivity"
+            android:exported="true"/>
 
         <!-- Khai báo SignupActivity -->
         <activity android:name=".SignupActivity"

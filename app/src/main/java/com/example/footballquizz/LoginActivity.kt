@@ -28,7 +28,7 @@ class LoginActivity :  AppCompatActivity() {
 
         // Nếu người dùng đã đăng nhập, chuyển tiếp sang
         if (auth.currentUser != null) {
-            startActivity(Intent(this@LoginActivity, QuizActivity::class.java))
+            startActivity(Intent(this@LoginActivity, DifficultySelectionActivity::class.java))
             finish()
         }
 
@@ -84,7 +84,7 @@ class LoginActivity :  AppCompatActivity() {
                             Toast.makeText(this@LoginActivity, getString(R.string.auth_failed), Toast.LENGTH_LONG).show()
                         }
                     } else {
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        val intent = Intent(this@LoginActivity, DifficultySelectionActivity::class.java)
                         startActivity(intent)
                         finish()
                     }

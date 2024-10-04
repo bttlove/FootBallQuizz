@@ -138,8 +138,9 @@
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="0dp"
             android:text="@string/change_email"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
 
         <Button
@@ -149,6 +150,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/change_password"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
 
         <Button
@@ -158,6 +160,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/send_password_reset_email"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
 
         <Button
@@ -167,6 +170,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/remove_user"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
 
         <Button

@@ -1,68 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:padding="16dp"
+  android:background="#F3F4F6"
+  tools:context=".QuizActivity">
 
-    <ImageView
-        android:id="@+id/ivPlayerImage"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:layout_margin="16dp"
-        android:contentDescription="Hình cầu thủ"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:scaleType="centerCrop"/>
-    <TextView
-        android:id="@+id/tvQuestion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Câu hỏi sẽ hiển thị ở đây"
-        android:textSize="24sp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp" />
+  <!-- Hình ảnh cầu thủ -->
+  <ImageView
+    android:id="@+id/ivPlayerImage"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:contentDescription="Hình cầu thủ"
+    android:scaleType="centerCrop"
+    app:layout_constraintDimensionRatio="H,16:9"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/tvQuestion"
+    android:layout_marginBottom="24dp"
+    android:layout_marginTop="100dp"
+    />
 
-    <Button
-        android:id="@+id/btnAnswer1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Câu trả lời 1"
-        app:layout_constraintTop_toBottomOf="@id/tvQuestion"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="8dp" />
+  <!-- Câu hỏi -->
+  <TextView
+    android:id="@+id/tvQuestion"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:text="Câu hỏi sẽ hiển thị ở đây"
+    android:textSize="18sp"
+    android:textColor="#333333"
+    android:textStyle="bold"
+    app:layout_constraintTop_toBottomOf="@id/ivPlayerImage"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="16dp"/>
 
-    <Button
-        android:id="@+id/btnAnswer2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Câu trả lời 2"
-        app:layout_constraintTop_toBottomOf="@id/btnAnswer1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="8dp" />
+  <!-- Câu trả lời 1 -->
+  <Button
+    android:id="@+id/btnAnswer1"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="Câu trả lời 1"
+    android:textSize="16sp"
+    app:layout_constraintTop_toBottomOf="@id/tvQuestion"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="8dp"
+    android:layout_margin="8dp"/>
 
-    <Button
-        android:id="@+id/btnAnswer3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Câu trả lời 3"
-        app:layout_constraintTop_toBottomOf="@id/btnAnswer2"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="8dp" />
+  <!-- Câu trả lời 2 -->
+  <Button
+    android:id="@+id/btnAnswer2"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="Câu trả lời 2"
+    android:textSize="16sp"
+    app:layout_constraintTop_toBottomOf="@id/btnAnswer1"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_margin="8dp"/>
 
-    <Button
-        android:id="@+id/btnAnswer4"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Câu trả lời 4"
-        app:layout_constraintTop_toBottomOf="@id/btnAnswer3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="8dp" />
+  <!-- Câu trả lời 3 -->
+  <Button
+    android:id="@+id/btnAnswer3"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="Câu trả lời 3"
+    android:textSize="16sp"
+    app:layout_constraintTop_toBottomOf="@id/btnAnswer2"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_margin="8dp"/>
+
+  <!-- Câu trả lời 4 -->
+  <Button
+    android:id="@+id/btnAnswer4"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="Câu trả lời 4"
+    android:textSize="16sp"
+    app:layout_constraintTop_toBottomOf="@id/btnAnswer3"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_margin="8dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

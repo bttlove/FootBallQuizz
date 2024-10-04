@@ -1,110 +1,136 @@
 package com.example.footballquizz
+
 import android.os.Bundle
-import android.content.Intent
-import android.widget.Button
+import android.util.Log
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 
-
 class QuizActivity : AppCompatActivity() {
-    private lateinit var tvQuestion: TextView
-    private lateinit var btnAnswer1: Button
-    private lateinit var btnAnswer2: Button
-    private lateinit var btnAnswer3: Button
-    private lateinit var btnAnswer4: Button
-    private lateinit var ivPlayerImage: ImageView
-    private lateinit var players: List<QuizzModel> // Danh sách cầu thủ
-    private lateinit var correctAnswer: String // Đáp án đúng
-    private var difficulty: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_quiz)
+  private lateinit var tvQuestion: TextView
+  private lateinit var btnAnswer1: Button
+  private lateinit var btnAnswer2: Button
+  private lateinit var btnAnswer3: Button
+  private lateinit var btnAnswer4: Button
+  private lateinit var ivPlayerImage: ImageView
 
-        tvQuestion = findViewById(R.id.tvQuestion)
-        btnAnswer1 = findViewById(R.id.btnAnswer1)
-        btnAnswer2 = findViewById(R.id.btnAnswer2)
-        btnAnswer3 = findViewById(R.id.btnAnswer3)
-        btnAnswer4 = findViewById(R.id.btnAnswer4)
+  private lateinit var players: List<QuizzModel>
+  private lateinit var correctAnswer: String
+  private var difficulty: String? = null
 
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_quiz)
 
-        // Nhận độ khó từ Intent
-        difficulty = intent.getStringExtra("DIFFICULTY")
+    // Khởi tạo các view
+    tvQuestion = findViewById(R.id.tvQuestion)
+    btnAnswer1 = findViewById(R.id.btnAnswer1)
+    btnAnswer2 = findViewById(R.id.btnAnswer2)
+    btnAnswer3 = findViewById(R.id.btnAnswer3)
+    btnAnswer4 = findViewById(R.id.btnAnswer4)
+    ivPlayerImage = findViewById(R.id.ivPlayerImage)
 
-        // Lấy dữ liệu cầu thủ từ Firebase
-        val firebaseRepo = FirebaseRepository()
-        firebaseRepo.getPlayersData { playerList ->
-            players = playerList
-            setupQuiz()
-        }
+    difficulty = intent.getStringExtra("DIFFICULTY")
 
-        setupAnswerButtons()
+    // Lấy dữ liệu cầu thủ từ Firebase
+    val firebaseRepo = FirebaseRepository()
+    firebaseRepo.getPlayersData { playerList ->
+      players = playerList
+      setupQuiz()
     }
 
-    private fun setupQuiz() {
-        // Chọn một cầu thủ ngẫu nhiên
-        val player = players.random()
-        // Hiển thị hình ảnh cầu thủ
-        Glide.with(this).load(player.imageUrl).into(ivPlayerImage)
-        when (difficulty) {
-            "easy" -> {
-                tvQuestion.text = "Cầu thủ này thuộc câu lạc bộ nào?"
-                correctAnswer = player.club
-                setupAnswerOptions(player.club, player.name, player.yearOfBirth.toString())
-            }
-            "medium" -> {
-                tvQuestion.text = "Cầu thủ này tên gì?"
-                correctAnswer = player.name
-                setupAnswerOptions(player.name, player.club, player.yearOfBirth.toString())
-            }
-            "hard" -> {
-                tvQuestion.text = "Cầu thủ này sinh năm bao nhiêu?"
-                correctAnswer = player.yearOfBirth.toString()
-                setupAnswerOptions(player.yearOfBirth.toString(), player.club, player.name)
-            }
-        }
+    setupAnswerButtons()
+  }
+
+  // Hàm để đặt câu hỏi, sẽ gọi lại mỗi khi người dùng trả lời
+  private fun setupQuiz() {
+    if (players.isEmpty()) {
+      tvQuestion.text = "Không có dữ liệu cầu thủ!"
+      return
     }
 
-    private fun setupAnswerOptions(correct: String, wrong1: String, wrong2: String) {
-        // Tạo danh sách các đáp án
-        val answers =  mutableListOf(correct)
+    // Chọn ngẫu nhiên một cầu thủ
+    val player = players.random()
 
-        // Lấy 2 cầu thủ ngẫu nhiên khác để làm đáp án sai
-        val wrongAnswers = players.filter { it.name != correct && it.club != wrong1 && it.yearOfBirth.toString() != wrong2 }
-            .shuffled()
-            .take(2)
-        answers.addAll(wrongAnswers.map {
-            when (difficulty) {
-                "easy" -> it.club // Đáp án sai cho câu hỏi câu lạc bộ
-                "medium" -> it.name // Đáp án sai cho câu hỏi tên
-                "hard" -> it.yearOfBirth.toString() // Đáp án sai cho câu hỏi năm sinh
-                else -> ""
-            }
-        })
-        btnAnswer1.text = answers[0]
-        btnAnswer2.text = answers[1]
-        btnAnswer3.text = answers[2]
-        btnAnswer4.text = "Câu trả lời khác"
+    // Log thông tin cầu thủ để kiểm tra
+    Log.d("QuizActivity", "Cầu thủ: ${player.Name}, Club: ${player.club}, Năm sinh: ${player.yearOfBirth}")
+
+    // Hiển thị ảnh của cầu thủ
+    Glide.with(this).load(player.imageUrl).into(ivPlayerImage)
+
+    // Tạo câu hỏi và đáp án dựa trên độ khó
+    when (difficulty) {
+      "easy" -> {
+        tvQuestion.text = "Cầu thủ ${player.Name} này thuộc câu lạc bộ nào?"
+        correctAnswer = player.club
+        setupAnswerOptions(player.club, player.Name, player.yearOfBirth.toString())
+      }
+      "medium" -> {
+        tvQuestion.text = "Cầu thủ này tên gì?"
+        correctAnswer = player.Name
+        setupAnswerOptions(player.Name, player.club, player.yearOfBirth.toString())
+      }
+      "hard" -> {
+        tvQuestion.text = "Cầu thủ ${player.Name} này sinh năm bao nhiêu?"
+        correctAnswer = player.yearOfBirth.toString()
+        setupAnswerOptions(player.yearOfBirth.toString(), player.club, player.Name)
+      }
+    }
+  }
+
+  // Thiết lập các lựa chọn đáp án
+  private fun setupAnswerOptions(correct: String, wrong1: String, wrong2: String) {
+    val answers = mutableListOf(correct)
+    val wrongAnswers = players.filter {
+      it.Name != correct &&
+        it.club != wrong1 &&
+        it.yearOfBirth.toString() != wrong2
+    }
+      .shuffled()
+      .take(3) // Lấy 3 câu trả lời sai
+
+    answers.addAll(wrongAnswers.map {
+      when (difficulty) {
+        "easy" -> it.club
+        "medium" -> it.Name
+        "hard" -> it.yearOfBirth.toString()
+        else -> ""
+      }
+    })
+
+    answers.shuffle() // Trộn tất cả các câu trả lời
+
+    // Gán đáp án cho các nút
+    btnAnswer1.text = answers[0]
+    btnAnswer2.text = answers[1]
+    btnAnswer3.text = answers[2]
+    btnAnswer4.text = answers[3]
+  }
+
+  // Thiết lập sự kiện nhấn vào các nút
+  private fun setupAnswerButtons() {
+    val clickListener = View.OnClickListener { view ->
+      val selectedAnswer = (view as Button).text.toString()
+      if (selectedAnswer == correctAnswer) {
+        tvQuestion.text = "Đúng rồi!"
+      } else {
+        tvQuestion.text = "Sai rồi, đáp án đúng là: $correctAnswer"
+      }
+
+      // Sau khi trả lời xong, đợi 1 giây rồi nạp câu hỏi mới
+      view.postDelayed({
+        setupQuiz() // Nạp câu hỏi tiếp theo
+      }, 1000)
     }
 
-    private fun setupAnswerButtons() {
-        val clickListener = View.OnClickListener { view ->
-            val selectedAnswer = (view as Button).text.toString()
-            if (selectedAnswer == correctAnswer) {
-                // Đáp án đúng
-                tvQuestion.text = "Đáp án đúng!"
-            } else {
-                // Đáp án sai
-                tvQuestion.text = "Đáp án sai, đáp án đúng là: $correctAnswer"
-            }
-        }
-
-        btnAnswer1.setOnClickListener(clickListener)
-        btnAnswer2.setOnClickListener(clickListener)
-        btnAnswer3.setOnClickListener(clickListener)
-        btnAnswer4.setOnClickListener(clickListener)
-    }
+    // Gán sự kiện cho tất cả các nút
+    btnAnswer1.setOnClickListener(clickListener)
+    btnAnswer2.setOnClickListener(clickListener)
+    btnAnswer3.setOnClickListener(clickListener)
+    btnAnswer4.setOnClickListener(clickListener)
+  }
 }

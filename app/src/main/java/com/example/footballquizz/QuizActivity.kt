@@ -1,5 +1,6 @@
 package com.example.footballquizz
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,6 +18,11 @@ class QuizActivity : AppCompatActivity() {
   private lateinit var btnAnswer3: Button
   private lateinit var btnAnswer4: Button
   private lateinit var ivPlayerImage: ImageView
+  private var easyQuestionsAsked = 0
+  private var mediumQuestionsAsked = 0
+  private var hardQuestionsAsked = 0
+  private var correctAnswers = 0
+  private var incorrectAnswers = 0
 
   private lateinit var players: List<QuizzModel>
   private lateinit var correctAnswer: String
@@ -51,6 +57,30 @@ class QuizActivity : AppCompatActivity() {
     if (players.isEmpty()) {
       tvQuestion.text = "Không có dữ liệu cầu thủ!"
       return
+    }
+    // Kiểm tra số lượng câu hỏi đã hỏi cho từng độ khó
+    when (difficulty) {
+      "easy" -> {
+        if (easyQuestionsAsked >= 5) {
+          navigateToScoreActivity()
+          return
+        }
+        easyQuestionsAsked++
+      }
+      "medium" -> {
+        if (mediumQuestionsAsked >= 5) {
+          navigateToScoreActivity()
+          return
+        }
+        mediumQuestionsAsked++
+      }
+      "hard" -> {
+        if (hardQuestionsAsked >= 5) {
+          navigateToScoreActivity()
+          return
+        }
+        hardQuestionsAsked++
+      }
     }
 
     // Chọn ngẫu nhiên một cầu thủ
@@ -117,9 +147,14 @@ class QuizActivity : AppCompatActivity() {
       val selectedAnswer = (view as Button).text.toString()
       if (selectedAnswer == correctAnswer) {
         tvQuestion.text = "Đúng rồi!"
+        correctAnswers++ // Tăng số câu đúng
       } else {
         tvQuestion.text = "Sai rồi, đáp án đúng là: $correctAnswer"
+        incorrectAnswers++ // Tăng số câu sai
       }
+
+      // Hiển thị điểm số
+      displayScore()
 
       // Sau khi trả lời xong, đợi 1 giây rồi nạp câu hỏi mới
       view.postDelayed({
@@ -132,5 +167,24 @@ class QuizActivity : AppCompatActivity() {
     btnAnswer2.setOnClickListener(clickListener)
     btnAnswer3.setOnClickListener(clickListener)
     btnAnswer4.setOnClickListener(clickListener)
+  }
+  private fun displayScore() {
+    val score = calculateScore()
+    tvQuestion.append("\nCâu đúng: $correctAnswers\nCâu sai: $incorrectAnswers\nĐiểm: $score")
+  }
+  private fun calculateScore(): Int {
+    var score = 0
+    // Tính điểm dựa trên số câu đúng
+    score += easyQuestionsAsked * 1 // 1 điểm cho mỗi câu dễ
+    score += mediumQuestionsAsked * 5 // 5 điểm cho mỗi câu trung bình
+    score += hardQuestionsAsked * 10 // 10 điểm cho mỗi câu khó
+
+    return score
+  }
+  private fun navigateToScoreActivity() {
+    val intent = Intent(this, ScoreActivity::class.java)
+    intent.putExtra("SCORE", calculateScore()) // Truyền điểm vào intent
+    startActivity(intent)
+    finish() // Đóng activity hiện tại
   }
 }

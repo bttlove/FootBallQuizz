@@ -25,6 +25,7 @@ class LoginActivity :  AppCompatActivity() {
 
         // Get Firebase auth instance
         auth = FirebaseAuth.getInstance()
+        auth.signOut()
 
         // Nếu người dùng đã đăng nhập, chuyển tiếp sang
         if (auth.currentUser != null) {

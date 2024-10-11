@@ -46,5 +46,7 @@
         <activity android:name=".SettingsActivity"
             android:exported="true"/>
 
+        <activity android:name=".HomePageActivity"
+            android:exported="true"/>
     </application>
 </manifest>

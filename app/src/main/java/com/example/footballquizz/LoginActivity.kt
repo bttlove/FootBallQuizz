@@ -91,6 +91,8 @@ class LoginActivity :  AppCompatActivity() {
                         }
                     } else {
 
+=======
+
                         // Lấy thời gian hiện tại
                         val currentDateTime = LocalDateTime.now()
                         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
@@ -119,9 +121,10 @@ class LoginActivity :  AppCompatActivity() {
                         // Chuyển tới màn hình DifficultySelectionActivity sau khi đăng nhập thành công
                         val intent = Intent(this@LoginActivity, DifficultySelectionActivity::class.java)
                         startActivity(intent)
-                        finish()
+                        finish() // Đóng LoginActivity
                     }
                 }
         }
+
     }
 }

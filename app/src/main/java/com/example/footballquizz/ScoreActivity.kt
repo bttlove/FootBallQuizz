@@ -25,7 +25,7 @@ class ScoreActivity : AppCompatActivity() {
         // Thiết lập sự kiện click cho nút "Chơi lại"
         btnRestart.setOnClickListener {
             // Chuyển về QuizActivity để bắt đầu lại
-            val intent = Intent(this, QuizActivity::class.java)
+            val intent = Intent(this, DifficultySelectionActivity::class.java)
             startActivity(intent)
             finish() // Đóng ScoreActivity
         }

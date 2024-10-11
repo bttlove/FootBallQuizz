@@ -74,14 +74,13 @@
 
         <Button
             android:id="@+id/sign_up_button"
-            style="?android:textAppearanceSmall"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@color/colorAccent"
-            android:text="@string/action_sign_in_short"
-            android:textColor="@android:color/white"
-            android:textStyle="bold" />
+            android:layout_marginTop="20dip"
+            android:background="@null"
+            android:text="Register"
+            android:textAllCaps="true"
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/btn_reset_password"

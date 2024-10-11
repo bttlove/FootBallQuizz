@@ -9,7 +9,10 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.gms.tasks.OnCompleteListener
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class LoginActivity :  AppCompatActivity() {
     private lateinit var inputEmail: EditText
@@ -19,6 +22,7 @@ class LoginActivity :  AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var btnReset: Button
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseFirestore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +31,7 @@ class LoginActivity :  AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         auth.signOut()
 
+        db = FirebaseFirestore.getInstance()
         // Nếu người dùng đã đăng nhập, chuyển tiếp sang
         if (auth.currentUser != null) {
             startActivity(Intent(this@LoginActivity, DifficultySelectionActivity::class.java))
@@ -85,6 +90,33 @@ class LoginActivity :  AppCompatActivity() {
                             Toast.makeText(this@LoginActivity, getString(R.string.auth_failed), Toast.LENGTH_LONG).show()
                         }
                     } else {
+
+                        // Lấy thời gian hiện tại
+                        val currentDateTime = LocalDateTime.now()
+                        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                        val formattedDateTime = currentDateTime.format(formatter)
+
+                        // Tạo map dữ liệu đăng nhập
+                        val user = hashMapOf(
+                            "e-mail" to email,
+                            "role" to "user", // Hoặc thay đổi role theo nhu cầu của bạn
+                            "start time" to currentDateTime.toString(),
+                            "end time" to currentDateTime.toString()
+                        )
+
+
+
+                        // Thêm document vào collection "login" trên Firestore
+                        db.collection("login")
+                            .add(user)
+                            .addOnSuccessListener { documentReference ->
+                                Toast.makeText(this@LoginActivity, "Login data saved", Toast.LENGTH_SHORT).show()
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this@LoginActivity, "Error saving login data: $e", Toast.LENGTH_SHORT).show()
+                            }
+
+                        // Chuyển tới màn hình DifficultySelectionActivity sau khi đăng nhập thành công
                         val intent = Intent(this@LoginActivity, DifficultySelectionActivity::class.java)
                         startActivity(intent)
                         finish()

@@ -1,22 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:id="@+id/tvScore"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        tools:ignore="MissingConstraints" />
+<androidx.constraintlayout.widget.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/btnRestart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chơi lại"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="184dp"
-        tools:layout_editor_absoluteY="412dp" />
+  <!-- Score TextView -->
+  <TextView
+    android:id="@+id/tvScore"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="24sp"
+    android:textStyle="bold"
+    android:text="Tổng điểm của bạn: "
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="40dp" />
+
+  <!-- Player Name Input Field -->
+  <com.google.android.material.textfield.TextInputLayout
+    android:id="@+id/playerNameLayout"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    app:layout_constraintTop_toBottomOf="@+id/tvScore"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="20dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp">
+
+    <com.google.android.material.textfield.TextInputEditText
+      android:id="@+id/playerNameEditText"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:hint="Nhập tên bạn muốn lưu"
+      android:inputType="textPersonName" />
+  </com.google.android.material.textfield.TextInputLayout>
+
+  <!-- Submit Score Button -->
+  <Button
+    android:id="@+id/btnSubmitScore"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Lưu điểm "
+    app:layout_constraintTop_toBottomOf="@+id/playerNameLayout"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="16dp" />
+
+  <!-- Restart Button -->
+  <Button
+    android:id="@+id/btnRestart"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Chơi lại"
+    app:layout_constraintTop_toBottomOf="@+id/btnSubmitScore"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="20dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

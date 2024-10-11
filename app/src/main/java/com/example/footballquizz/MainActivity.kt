@@ -16,7 +16,7 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-
+import com.google.android.material.bottomnavigation.BottomNavigationView
 class MainActivity : AppCompatActivity() {
 
     private lateinit var btnChangeEmail: Button
@@ -58,6 +58,18 @@ class MainActivity : AppCompatActivity() {
                 // Launch login activity
                 startActivity(Intent(this@MainActivity, LoginActivity::class.java))
                 finish()
+            }
+        }
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+
+                R.id.nav_home -> {
+                    // Chuyển đến trang DifficultySelectionActivity
+                    startActivity(Intent(this, DifficultySelectionActivity::class.java))
+                    true
+                }
+                else -> false
             }
         }
 

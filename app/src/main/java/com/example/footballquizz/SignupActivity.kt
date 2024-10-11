@@ -10,6 +10,9 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class SignupActivity : AppCompatActivity() {
     private lateinit var inputEmail: EditText
@@ -48,7 +51,6 @@ class SignupActivity : AppCompatActivity() {
             createAccount()
         }
     }
-
     private fun createAccount() {
         val email = inputEmail.text.toString().trim()
         val password = inputPassword.text.toString().trim()
@@ -71,14 +73,48 @@ class SignupActivity : AppCompatActivity() {
 
         progressBar.visibility = View.VISIBLE
 
-        // Create user
+        // Create user in Firebase Authentication
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
                 progressBar.visibility = View.GONE
                 if (task.isSuccessful) {
-                    showToast("Account created successfully.")
-                    startActivity(Intent(this@SignupActivity, MainActivity::class.java))
-                    finish()
+                    val user = auth.currentUser
+                    val userId = user?.uid
+
+                    // Get current date-time
+                    val currentDateTime = LocalDateTime.now()
+                    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+                    val formattedDateTime = currentDateTime.format(formatter)
+
+                    val role = if (email.endsWith("@admin.com")) "admin" else "user"
+                    // Create user data to store in Firestore
+                    val userData = hashMapOf(
+                        "e-mail" to email,
+                        "role" to "user", // Default role
+                        "date-time" to currentDateTime.toString(),
+                        "name" to "", // You can prompt the user to enter their name later
+                        "picture" to "" // Placeholder for profile picture
+                    )
+
+                    // Get Firestore instance
+                    val db = FirebaseFirestore.getInstance()
+
+                    // Add user data to Firestore under the "auths" collection
+                    if (userId != null) {
+                        db.collection("auths").document(userId)
+                            .set(userData)
+                            .addOnSuccessListener {
+                                showToast("Account created and saved successfully.")
+                                startActivity(Intent(this@SignupActivity, LoginActivity::class.java))
+                                finish()
+                            }
+                            .addOnFailureListener { e ->
+                                showToast("Failed to save user data: ${e.message}")
+                            }
+                    } else {
+                        showToast("Error: Could not get user ID.")
+                    }
+
                 } else {
                     showToast("Authentication failed: ${task.exception?.message}")
                 }

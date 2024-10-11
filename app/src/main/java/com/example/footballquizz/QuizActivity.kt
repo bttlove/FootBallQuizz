@@ -10,6 +10,8 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 
+import android.os.CountDownTimer
+
 class QuizActivity : AppCompatActivity() {
 
   private lateinit var tvQuestion: TextView
@@ -18,11 +20,16 @@ class QuizActivity : AppCompatActivity() {
   private lateinit var btnAnswer3: Button
   private lateinit var btnAnswer4: Button
   private lateinit var ivPlayerImage: ImageView
+  private lateinit var tvTimer: TextView // Thêm TextView để hiển thị thời gian
   private var easyQuestionsAsked = 0
+  private var easyCorrectAnswers = 0
+  private var mediumCorrectAnswers = 0
+  private var hardCorrectAnswers = 0
   private var mediumQuestionsAsked = 0
   private var hardQuestionsAsked = 0
   private var correctAnswers = 0
   private var incorrectAnswers = 0
+  private var timer: CountDownTimer? = null // Đối tượng CountDownTimer
 
   private lateinit var players: List<QuizzModel>
   private lateinit var correctAnswer: String
@@ -39,6 +46,7 @@ class QuizActivity : AppCompatActivity() {
     btnAnswer3 = findViewById(R.id.btnAnswer3)
     btnAnswer4 = findViewById(R.id.btnAnswer4)
     ivPlayerImage = findViewById(R.id.ivPlayerImage)
+    tvTimer = findViewById(R.id.tvTimer) // Khởi tạo TextView hiển thị đếm ngược thời gian
 
     difficulty = intent.getStringExtra("DIFFICULTY")
 
@@ -52,30 +60,34 @@ class QuizActivity : AppCompatActivity() {
     setupAnswerButtons()
   }
 
-  // Hàm để đặt câu hỏi, sẽ gọi lại mỗi khi người dùng trả lời
+  // Hàm đặt câu hỏi, sẽ gọi lại mỗi khi người dùng trả lời
   private fun setupQuiz() {
     if (players.isEmpty()) {
       tvQuestion.text = "Không có dữ liệu cầu thủ!"
       return
     }
+
+    // Reset timer nếu có
+    timer?.cancel()
+
     // Kiểm tra số lượng câu hỏi đã hỏi cho từng độ khó
     when (difficulty) {
       "easy" -> {
-        if (easyQuestionsAsked >= 5) {
+        if (easyQuestionsAsked >= 10) {
           navigateToScoreActivity()
           return
         }
         easyQuestionsAsked++
       }
       "medium" -> {
-        if (mediumQuestionsAsked >= 5) {
+        if (mediumQuestionsAsked >= 10) {
           navigateToScoreActivity()
           return
         }
         mediumQuestionsAsked++
       }
       "hard" -> {
-        if (hardQuestionsAsked >= 5) {
+        if (hardQuestionsAsked >= 10) {
           navigateToScoreActivity()
           return
         }
@@ -85,9 +97,6 @@ class QuizActivity : AppCompatActivity() {
 
     // Chọn ngẫu nhiên một cầu thủ
     val player = players.random()
-
-    // Log thông tin cầu thủ để kiểm tra
-    Log.d("QuizActivity", "Cầu thủ: ${player.Name}, Club: ${player.club}, Năm sinh: ${player.yearOfBirth}")
 
     // Hiển thị ảnh của cầu thủ
     Glide.with(this).load(player.imageUrl).into(ivPlayerImage)
@@ -110,6 +119,9 @@ class QuizActivity : AppCompatActivity() {
         setupAnswerOptions(player.yearOfBirth.toString(), player.club, player.Name)
       }
     }
+
+    // Bắt đầu đếm ngược 2 phút (120 giây)
+    startCountdownTimer()
   }
 
   // Thiết lập các lựa chọn đáp án
@@ -119,9 +131,7 @@ class QuizActivity : AppCompatActivity() {
       it.Name != correct &&
         it.club != wrong1 &&
         it.yearOfBirth.toString() != wrong2
-    }
-      .shuffled()
-      .take(3) // Lấy 3 câu trả lời sai
+    }.shuffled().take(3) // Lấy 3 câu trả lời sai
 
     answers.addAll(wrongAnswers.map {
       when (difficulty) {
@@ -144,10 +154,19 @@ class QuizActivity : AppCompatActivity() {
   // Thiết lập sự kiện nhấn vào các nút
   private fun setupAnswerButtons() {
     val clickListener = View.OnClickListener { view ->
+      timer?.cancel() // Hủy bộ đếm ngược khi người dùng nhấn nút
+
       val selectedAnswer = (view as Button).text.toString()
       if (selectedAnswer == correctAnswer) {
         tvQuestion.text = "Đúng rồi!"
-        correctAnswers++ // Tăng số câu đúng
+        correctAnswers++ // Tăng tổng số câu đúng
+
+        // Tăng số câu trả lời đúng dựa trên độ khó
+        when (difficulty) {
+          "easy" -> easyCorrectAnswers++
+          "medium" -> mediumCorrectAnswers++
+          "hard" -> hardCorrectAnswers++
+        }
       } else {
         tvQuestion.text = "Sai rồi, đáp án đúng là: $correctAnswer"
         incorrectAnswers++ // Tăng số câu sai
@@ -168,20 +187,49 @@ class QuizActivity : AppCompatActivity() {
     btnAnswer3.setOnClickListener(clickListener)
     btnAnswer4.setOnClickListener(clickListener)
   }
+
+  // Hiển thị điểm số
   private fun displayScore() {
     val score = calculateScore()
     tvQuestion.append("\nCâu đúng: $correctAnswers\nCâu sai: $incorrectAnswers\nĐiểm: $score")
   }
+
+  // Tính điểm dựa trên độ khó
   private fun calculateScore(): Int {
     var score = 0
-    // Tính điểm dựa trên số câu đúng
-    score += easyQuestionsAsked * 1 // 1 điểm cho mỗi câu dễ
-    score += mediumQuestionsAsked * 5 // 5 điểm cho mỗi câu trung bình
-    score += hardQuestionsAsked * 10 // 10 điểm cho mỗi câu khó
-
+    score += easyCorrectAnswers  * 1 // 1 điểm cho mỗi câu dễ
+    score += mediumCorrectAnswers * 5 // 5 điểm cho mỗi câu trung bình
+    score += hardCorrectAnswers * 10 // 10 điểm cho mỗi câu khó
     return score
   }
+
+  // Bắt đầu đếm ngược 2 phút
+  private fun startCountdownTimer() {
+    timer = object : CountDownTimer(30000, 1000) { // 2 phút
+      override fun onTick(millisUntilFinished: Long) {
+        val secondsRemaining = millisUntilFinished / 1000
+        tvTimer.text = "Thời gian còn lại: $secondsRemaining giây"
+      }
+
+      override fun onFinish() {
+        // Hết giờ, coi như trả lời sai và chuyển câu hỏi
+        tvQuestion.text = "Hết thời gian! Đáp án đúng là: $correctAnswer"
+        incorrectAnswers++ // Tăng số câu sai
+
+        // Hiển thị điểm số
+        displayScore()
+
+        // Sau khi hết giờ, đợi 1 giây rồi nạp câu hỏi mới
+        tvQuestion.postDelayed({
+          setupQuiz() // Nạp câu hỏi tiếp theo
+        }, 1000)
+      }
+    }.start()
+  }
+
+  // Hàm chuyển sang màn hình điểm số khi hoàn thành câu hỏi
   private fun navigateToScoreActivity() {
+    timer?.cancel() // Hủy đếm ngược khi kết thúc quiz
     val intent = Intent(this, ScoreActivity::class.java)
     intent.putExtra("SCORE", calculateScore()) // Truyền điểm vào intent
     startActivity(intent)

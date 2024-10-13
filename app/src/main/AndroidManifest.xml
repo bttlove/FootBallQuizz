@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.FootBallQuizz"
+
         tools:targetApi="31">
 
         <activity android:name=".MainActivity"
@@ -35,10 +36,17 @@
 
         <activity android:name=".QuizActivity"
             android:exported="true"/>
-
+        <activity android:name=".ScoreActivity"
+            android:exported="true"/>
         <!-- Khai báo SignupActivity -->
         <activity android:name=".SignupActivity"
             android:exported="true"/>
+        <activity android:name=".ScoreActivity"
+            android:exported="true"/>
+        <activity android:name=".SettingsActivity"
+            android:exported="true"/>
 
+        <activity android:name=".HomePageActivity"
+            android:exported="true"/>
     </application>
 </manifest>

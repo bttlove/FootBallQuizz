@@ -16,13 +16,17 @@
     android:layout_height="0dp"
     android:contentDescription="Hình cầu thủ"
     android:scaleType="fitCenter"
+<<<<<<< HEAD
     app:layout_constraintDimensionRatio="H,16:9"
+=======
+    app:layout_constraintDimensionRatio="H,16:10"
+>>>>>>> 25a895a5f88498580272fa249e4413b908723c29
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintBottom_toTopOf="@id/tvQuestion"
     android:layout_marginBottom="24dp"
-    android:layout_marginTop="100dp"
+    android:layout_marginTop="80dp"
     />
 
   <!-- Câu hỏi -->
@@ -40,6 +44,19 @@
     app:layout_constraintEnd_toEndOf="parent"
     android:layout_marginTop="16dp"/>
 
+  <!-- Bộ đếm thời gian -->
+  <TextView
+    android:id="@+id/tvTimer"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Thời gian còn lại: 120 giây"
+    android:textSize="16sp"
+    android:textColor="#FF0000"
+    app:layout_constraintTop_toBottomOf="@id/tvQuestion"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginTop="8dp"/>
+
   <!-- Câu trả lời 1 -->
   <Button
     android:id="@+id/btnAnswer1"
@@ -47,7 +64,7 @@
     android:layout_height="wrap_content"
     android:text="Câu trả lời 1"
     android:textSize="16sp"
-    app:layout_constraintTop_toBottomOf="@id/tvQuestion"
+    app:layout_constraintTop_toBottomOf="@id/tvTimer"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     android:layout_marginTop="8dp"

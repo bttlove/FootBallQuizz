@@ -5,11 +5,27 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-class DifficultySelectionActivity  : AppCompatActivity()  {
+import com.google.android.material.bottomnavigation.BottomNavigationView
+
+class DifficultySelectionActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_difficulty_selection)
 
+        // Thiết lập thanh điều hướng
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_settings -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // Thiết lập nút chọn độ khó
         findViewById<Button>(R.id.btnEasy).setOnClickListener {
             startQuizActivity("easy")
         }

@@ -41,10 +41,10 @@
         <!-- Khai báo SignupActivity -->
         <activity android:name=".SignupActivity"
             android:exported="true"/>
-        <activity android:name=".ScoreActivity"
+        <activity android:name=".AdminActivity"
             android:exported="true"/>
-        <activity android:name=".SettingsActivity"
-            android:exported="true"/>
+       <!-- <activity android:name=".SettingsActivity"
+            android:exported="true"/>-->
 
         <activity android:name=".HomePageActivity"
             android:exported="true"/>

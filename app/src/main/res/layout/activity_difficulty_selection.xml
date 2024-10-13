@@ -1,99 +1,166 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  android:padding="16dp"
-  android:background="#F3F4F6"
-  tools:context=".DifficultySelectionActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#F3F4F6"
+    tools:context=".DifficultySelectionActivity">
 
-  <!-- Ranking -->
+  <!-- Greeting and Profile Icon -->
   <TextView
-    android:id="@+id/tvRanking"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Ranking: 20"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:textColor="#333333"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_marginTop="32dp"/>
+      android:id="@+id/greeting"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Hello, Player"
+      android:textSize="30sp"
+      android:textStyle="bold"
+      android:layout_marginTop="20dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
-  <!-- Your Score -->
-  <TextView
-    android:id="@+id/tvYourScore"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Your Score: 80"
-    android:textSize="20sp"
-    android:textStyle="bold"
-    android:textColor="#333333"
-    app:layout_constraintTop_toBottomOf="@id/tvRanking"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_marginTop="16dp"/>
+  <ImageView
+      android:id="@+id/profile_icon"
+      android:layout_width="50dp"
+      android:layout_height="50dp"
+      android:layout_marginTop="20dp"
+      android:contentDescription="Profile Icon"
+      android:scaleType="centerCrop"
+      android:src="@drawable/user_image"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
-  <!-- Chọn độ khó -->
-  <TextView
-    android:id="@+id/tvSelectDifficulty"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="Chọn độ khó"
-    android:textSize="24sp"
-    android:textStyle="bold"
-    android:textColor="#333333"
-    app:layout_constraintTop_toBottomOf="@id/tvYourScore"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_marginTop="32dp" />
+  <!-- Rank and Points Section -->
+  <LinearLayout
+      android:id="@+id/rank_section"
+      android:layout_width="match_parent"
+      android:layout_height="68dp"
+      android:layout_marginTop="40dp"
+      android:background="#ffffff"
+      android:elevation="4dp"
+      android:orientation="horizontal"
+      android:padding="10dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/greeting">
 
-  <!-- Nút Dễ -->
-  <Button
-    android:id="@+id/btnEasy"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:text="Dễ"
-    android:textSize="18sp"
-    android:backgroundTint="#4CAF50"
-    android:textColor="#FFFFFF"
-    app:layout_constraintTop_toBottomOf="@id/tvSelectDifficulty"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_marginTop="100dp"
-    android:layout_margin="16dp" />
+    <!-- Rank -->
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/cup_image" />
 
-  <!-- Nút Trung Bình -->
-  <Button
-    android:id="@+id/btnMedium"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:text="Trung Bình"
-    android:textSize="18sp"
-    android:backgroundTint="#FFC107"
-    android:textColor="#FFFFFF"
-    app:layout_constraintTop_toBottomOf="@id/btnEasy"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_margin="16dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Rank: "
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
-  <!-- Nút Khó -->
-  <Button
-    android:id="@+id/btnHard"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:text="Khó"
-    android:textSize="18sp"
-    android:backgroundTint="#F44336"
-    android:textColor="#FFFFFF"
-    app:layout_constraintTop_toBottomOf="@id/btnMedium"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    android:layout_margin="16dp" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="20"
+        android:textSize="20sp" />
+
+    <!-- Divider -->
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:layout_marginStart="16dp"
+        android:background="#000000" />
+
+    <!-- Points -->
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="Star Icon"
+        android:src="@drawable/point_image" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="Points: "
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="80"
+        android:textSize="20sp" />
+  </LinearLayout>
+
+  <!-- "Let's Play" Title -->
+
+  <!-- Game Mode Buttons as GridLayout -->
 
   <!-- Bottom Navigation -->
+
+  <TextView
+      android:id="@+id/lets_play"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="4dp"
+      android:text="Chọn độ khó"
+      android:textSize="30sp"
+      android:textStyle="bold"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/rank_section" />
+
+  <GridLayout
+      android:id="@+id/game_modes"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="12dp"
+      android:alignmentMode="alignMargins"
+      android:columnCount="2"
+      android:rowCount="2"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.191"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/lets_play">
+
+    <!-- Nút Dễ -->
+    <Button
+        android:id="@+id/btnEasy"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:backgroundTint="#4CAF50"
+        android:text="Dễ"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+    <!-- Nút Trung Bình -->
+    <Button
+        android:id="@+id/btnMedium"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:backgroundTint="#FFC107"
+        android:text="Trung Bình"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+
+    <!-- Nút Khó -->
+    <Button
+        android:id="@+id/btnHard"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_margin="8dp"
+        android:backgroundTint="#F44336"
+        android:text="Khó"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
+  </GridLayout>
+
   <com.google.android.material.bottomnavigation.BottomNavigationView
       android:id="@+id/bottom_navigation"
       android:layout_width="match_parent"
@@ -102,4 +169,5 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintEnd_toEndOf="parent"
       app:menu="@menu/bottom_nav_menu" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

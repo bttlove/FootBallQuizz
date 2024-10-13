@@ -18,9 +18,10 @@ class ScoreActivity : AppCompatActivity() {
   private lateinit var playerNameEditText: EditText
   private lateinit var btnSubmitScore: Button
   private lateinit var btnRestart: Button
+  private lateinit var btnViewHistory: Button
 
-  private val db = FirebaseFirestore.getInstance() // Firebase Firestore instance
-  private val auth = FirebaseAuth.getInstance()   // FirebaseAuth instance
+  private val db = FirebaseFirestore.getInstance()
+  private val auth = FirebaseAuth.getInstance()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -30,12 +31,17 @@ class ScoreActivity : AppCompatActivity() {
     playerNameEditText = findViewById(R.id.playerNameEditText)
     btnSubmitScore = findViewById(R.id.btnSubmitScore)
     btnRestart = findViewById(R.id.btnRestart)
+    btnViewHistory = findViewById(R.id.btnViewHistory)
 
-    // Receive score from intent
+    // Receive data from intent
     val score = intent.getIntExtra("SCORE", 0)
+    val difficulty = intent.getStringExtra("DIFFICULTY")
+    val timeTakenInMillis = intent.getLongExtra("TIME_TAKEN", 0L)
+    val timeTakenInSeconds = timeTakenInMillis / 1000
+
     tvScore.text = "Tổng điểm của bạn: $score"
 
-    // Get the current logged-in user's email from FirebaseAuth
+    // Get the current logged-in user's email
     val currentUser = auth.currentUser
     val userEmail = currentUser?.email
 
@@ -44,12 +50,12 @@ class ScoreActivity : AppCompatActivity() {
       return
     }
 
-    // Handle score submission to Firebase
+    // Handle score submission to Firestore
     btnSubmitScore.setOnClickListener {
       val playerName = playerNameEditText.text.toString()
 
       if (playerName.isEmpty()) {
-        Toast.makeText(this, "Please enter your name", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Vui lòng nhập tên", Toast.LENGTH_SHORT).show()
         return@setOnClickListener
       }
 
@@ -59,9 +65,11 @@ class ScoreActivity : AppCompatActivity() {
 
       // Create a map to store in Firestore
       val scoreData = hashMapOf(
-        "e-mail" to userEmail,  // Use logged-in user's email
+        "e-mail" to userEmail,
         "name" to playerName,
         "point" to score.toString(),
+        "difficulty" to difficulty,
+        "timeTaken" to timeTakenInSeconds.toString(),
         "time" to currentTime
       )
 
@@ -69,10 +77,10 @@ class ScoreActivity : AppCompatActivity() {
       db.collection("score")
         .add(scoreData)
         .addOnSuccessListener {
-          Toast.makeText(this, "Score submitted successfully!", Toast.LENGTH_SHORT).show()
+          Toast.makeText(this, "Lưu điểm thành công!", Toast.LENGTH_SHORT).show()
         }
         .addOnFailureListener { e ->
-          Toast.makeText(this, "Failed to submit score: $e", Toast.LENGTH_SHORT).show()
+          Toast.makeText(this, "Lưu điểm thất bại: $e", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -80,7 +88,13 @@ class ScoreActivity : AppCompatActivity() {
     btnRestart.setOnClickListener {
       val intent = Intent(this, DifficultySelectionActivity::class.java)
       startActivity(intent)
-      finish() // Close ScoreActivity
+      finish()
+    }
+
+    // View history
+    btnViewHistory.setOnClickListener {
+      val intent = Intent(this, HistoryActivity::class.java)
+      startActivity(intent)
     }
   }
 }

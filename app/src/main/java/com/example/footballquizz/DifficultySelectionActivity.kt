@@ -39,7 +39,7 @@ class DifficultySelectionActivity : AppCompatActivity() {
 
         // Thiết lập thanh điều hướng
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+        bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_settings -> {
                     startActivity(Intent(this, MainActivity::class.java))

@@ -16,7 +16,11 @@
     android:layout_height="0dp"
     android:contentDescription="Hình cầu thủ"
     android:scaleType="fitCenter"
+
+
+
     app:layout_constraintDimensionRatio="H,16:10"
+
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"

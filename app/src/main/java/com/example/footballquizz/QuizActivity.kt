@@ -20,7 +20,7 @@ class QuizActivity : AppCompatActivity() {
   private lateinit var btnAnswer3: Button
   private lateinit var btnAnswer4: Button
   private lateinit var ivPlayerImage: ImageView
-  private lateinit var tvTimer: TextView // Thêm TextView để hiển thị thời gian
+  private lateinit var tvTimer: TextView
   private var easyQuestionsAsked = 0
   private var easyCorrectAnswers = 0
   private var mediumCorrectAnswers = 0
@@ -29,28 +29,34 @@ class QuizActivity : AppCompatActivity() {
   private var hardQuestionsAsked = 0
   private var correctAnswers = 0
   private var incorrectAnswers = 0
-  private var timer: CountDownTimer? = null // Đối tượng CountDownTimer
+  private var timer: CountDownTimer? = null
 
   private lateinit var players: List<QuizzModel>
   private lateinit var correctAnswer: String
   private var difficulty: String? = null
 
+  private var quizStartTime: Long = 0L
+  private var remainingTimeInMillis: Long = 0L
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.activity_quiz)
 
-    // Khởi tạo các view
+    // Initialize views
     tvQuestion = findViewById(R.id.tvQuestion)
     btnAnswer1 = findViewById(R.id.btnAnswer1)
     btnAnswer2 = findViewById(R.id.btnAnswer2)
     btnAnswer3 = findViewById(R.id.btnAnswer3)
     btnAnswer4 = findViewById(R.id.btnAnswer4)
     ivPlayerImage = findViewById(R.id.ivPlayerImage)
-    tvTimer = findViewById(R.id.tvTimer) // Khởi tạo TextView hiển thị đếm ngược thời gian
+    tvTimer = findViewById(R.id.tvTimer)
 
     difficulty = intent.getStringExtra("DIFFICULTY")
 
-    // Lấy dữ liệu cầu thủ từ Firebase
+    // Start time of the quiz
+    quizStartTime = System.currentTimeMillis()
+
+    // Get player data from Firebase
     val firebaseRepo = FirebaseRepository()
     firebaseRepo.getPlayersData { playerList ->
       players = playerList
@@ -60,17 +66,17 @@ class QuizActivity : AppCompatActivity() {
     setupAnswerButtons()
   }
 
-  // Hàm đặt câu hỏi, sẽ gọi lại mỗi khi người dùng trả lời
+  // Setup quiz question
   private fun setupQuiz() {
     if (players.isEmpty()) {
       tvQuestion.text = "Không có dữ liệu cầu thủ!"
       return
     }
 
-    // Reset timer nếu có
+    // Reset timer if any
     timer?.cancel()
 
-    // Kiểm tra số lượng câu hỏi đã hỏi cho từng độ khó
+    // Check the number of questions asked per difficulty
     when (difficulty) {
       "easy" -> {
         if (easyQuestionsAsked >= 10) {
@@ -95,13 +101,13 @@ class QuizActivity : AppCompatActivity() {
       }
     }
 
-    // Chọn ngẫu nhiên một cầu thủ
+    // Randomly select a player
     val player = players.random()
 
-    // Hiển thị ảnh của cầu thủ
+    // Display player's image
     Glide.with(this).load(player.imageUrl).into(ivPlayerImage)
 
-    // Tạo câu hỏi và đáp án dựa trên độ khó
+    // Create question and answers based on difficulty
     when (difficulty) {
       "easy" -> {
         tvQuestion.text = "Cầu thủ ${player.Name} này thuộc câu lạc bộ nào?"
@@ -120,18 +126,18 @@ class QuizActivity : AppCompatActivity() {
       }
     }
 
-    // Bắt đầu đếm ngược 2 phút (120 giây)
+    // Start countdown timer
     startCountdownTimer()
   }
 
-  // Thiết lập các lựa chọn đáp án
+  // Setup answer options
   private fun setupAnswerOptions(correct: String, wrong1: String, wrong2: String) {
     val answers = mutableListOf(correct)
     val wrongAnswers = players.filter {
       it.Name != correct &&
-        it.club != wrong1 &&
-        it.yearOfBirth.toString() != wrong2
-    }.shuffled().take(3) // Lấy 3 câu trả lời sai
+              it.club != wrong1 &&
+              it.yearOfBirth.toString() != wrong2
+    }.shuffled().take(3)
 
     answers.addAll(wrongAnswers.map {
       when (difficulty) {
@@ -142,26 +148,25 @@ class QuizActivity : AppCompatActivity() {
       }
     })
 
-    answers.shuffle() // Trộn tất cả các câu trả lời
+    answers.shuffle()
 
-    // Gán đáp án cho các nút
+    // Assign answers to buttons
     btnAnswer1.text = answers[0]
     btnAnswer2.text = answers[1]
     btnAnswer3.text = answers[2]
     btnAnswer4.text = answers[3]
   }
 
-  // Thiết lập sự kiện nhấn vào các nút
+  // Setup answer buttons
   private fun setupAnswerButtons() {
     val clickListener = View.OnClickListener { view ->
-      timer?.cancel() // Hủy bộ đếm ngược khi người dùng nhấn nút
+      timer?.cancel()
 
       val selectedAnswer = (view as Button).text.toString()
       if (selectedAnswer == correctAnswer) {
         tvQuestion.text = "Đúng rồi!"
-        correctAnswers++ // Tăng tổng số câu đúng
+        correctAnswers++
 
-        // Tăng số câu trả lời đúng dựa trên độ khó
         when (difficulty) {
           "easy" -> easyCorrectAnswers++
           "medium" -> mediumCorrectAnswers++
@@ -169,70 +174,77 @@ class QuizActivity : AppCompatActivity() {
         }
       } else {
         tvQuestion.text = "Sai rồi, đáp án đúng là: $correctAnswer"
-        incorrectAnswers++ // Tăng số câu sai
+        incorrectAnswers++
       }
 
-      // Hiển thị điểm số
+      // Display score
       displayScore()
 
-      // Sau khi trả lời xong, đợi 1 giây rồi nạp câu hỏi mới
+      // Load next question after 1 second
       view.postDelayed({
-        setupQuiz() // Nạp câu hỏi tiếp theo
+        setupQuiz()
       }, 1000)
     }
 
-    // Gán sự kiện cho tất cả các nút
+    // Assign click listeners
     btnAnswer1.setOnClickListener(clickListener)
     btnAnswer2.setOnClickListener(clickListener)
     btnAnswer3.setOnClickListener(clickListener)
     btnAnswer4.setOnClickListener(clickListener)
   }
 
-  // Hiển thị điểm số
+  // Display score
   private fun displayScore() {
     val score = calculateScore()
     tvQuestion.append("\nCâu đúng: $correctAnswers\nCâu sai: $incorrectAnswers\nĐiểm: $score")
   }
 
-  // Tính điểm dựa trên độ khó
+  // Calculate score based on difficulty
   private fun calculateScore(): Int {
     var score = 0
-    score += easyCorrectAnswers  * 1 // 1 điểm cho mỗi câu dễ
-    score += mediumCorrectAnswers * 5 // 5 điểm cho mỗi câu trung bình
-    score += hardCorrectAnswers * 10 // 10 điểm cho mỗi câu khó
+    score += easyCorrectAnswers * 1
+    score += mediumCorrectAnswers * 5
+    score += hardCorrectAnswers * 10
     return score
   }
 
-  // Bắt đầu đếm ngược 2 phút
+  // Start countdown timer
   private fun startCountdownTimer() {
-    timer = object : CountDownTimer(30000, 1000) { // 2 phút
+    timer = object : CountDownTimer(30000, 1000) { // 30 seconds per question
       override fun onTick(millisUntilFinished: Long) {
+        remainingTimeInMillis = millisUntilFinished
         val secondsRemaining = millisUntilFinished / 1000
         tvTimer.text = "Thời gian còn lại: $secondsRemaining giây"
       }
 
       override fun onFinish() {
-        // Hết giờ, coi như trả lời sai và chuyển câu hỏi
+        remainingTimeInMillis = 0
         tvQuestion.text = "Hết thời gian! Đáp án đúng là: $correctAnswer"
-        incorrectAnswers++ // Tăng số câu sai
+        incorrectAnswers++
 
-        // Hiển thị điểm số
+        // Display score
         displayScore()
 
-        // Sau khi hết giờ, đợi 1 giây rồi nạp câu hỏi mới
+        // Load next question after 1 second
         tvQuestion.postDelayed({
-          setupQuiz() // Nạp câu hỏi tiếp theo
+          setupQuiz()
         }, 1000)
       }
     }.start()
   }
 
-  // Hàm chuyển sang màn hình điểm số khi hoàn thành câu hỏi
+  // Navigate to ScoreActivity
   private fun navigateToScoreActivity() {
-    timer?.cancel() // Hủy đếm ngược khi kết thúc quiz
+    timer?.cancel()
+
+    val quizEndTime = System.currentTimeMillis()
+    val totalTimeTaken = quizEndTime - quizStartTime
+
     val intent = Intent(this, ScoreActivity::class.java)
-    intent.putExtra("SCORE", calculateScore()) // Truyền điểm vào intent
+    intent.putExtra("SCORE", calculateScore())
+    intent.putExtra("DIFFICULTY", difficulty)
+    intent.putExtra("TIME_TAKEN", totalTimeTaken)
     startActivity(intent)
-    finish() // Đóng activity hiện tại
+    finish()
   }
 }

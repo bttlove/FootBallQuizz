@@ -1,9 +1,11 @@
 package com.example.footballquizz
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ListView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -22,6 +24,18 @@ class HistoryActivity : AppCompatActivity() {
 
         listViewHistory = findViewById(R.id.listViewHistory)
 
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+
+                R.id.nav_history -> {
+                    // Chuyển đến trang DifficultySelectionActivity
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
         // Get the current logged-in user's email
         val currentUser = auth.currentUser
         val userEmail = currentUser?.email
@@ -57,6 +71,7 @@ class HistoryActivity : AppCompatActivity() {
                 historyAdapter = HistoryAdapter(this, historyList)
                 listViewHistory.adapter = historyAdapter
             }
+
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to fetch history: $e", Toast.LENGTH_SHORT).show()
             }

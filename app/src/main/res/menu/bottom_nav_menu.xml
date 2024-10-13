@@ -7,4 +7,10 @@
         android:id="@+id/nav_settings"
         android:icon="@drawable/baseline_settings_24"
         android:title="Cài Đặt" />
+
+    <item
+        android:id="@+id/nav_history"
+        android:icon="@drawable/baseline_settings_24"
+        android:title="Lịch sử"/>
+
 </menu>

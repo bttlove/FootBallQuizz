@@ -47,5 +47,9 @@
 
         <activity android:name=".HomePageActivity"
             android:exported="true"/>
+        <activity android:name=".RankingActivity"
+            android:exported="true"/>
+        <activity android:name=".HistoryActivity"
+            android:exported="true"/>
     </application>
 </manifest>

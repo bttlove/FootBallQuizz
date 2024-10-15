@@ -61,12 +61,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+        bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
 
-                R.id.nav_home -> {
+                R.id.nav_history -> {
                     // Chuyển đến trang DifficultySelectionActivity
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                    true
+                }
+                R.id.nav_home -> {
                     startActivity(Intent(this, DifficultySelectionActivity::class.java))
+                    true
+                }
+                R.id.nav_ranking -> {
+                    startActivity(Intent(this, RankingActivity::class.java))
+                    true
+                }
+                R.id.nav_home_admin -> {
+                    startActivity(Intent(this, AdminActivity::class.java))
                     true
                 }
                 else -> false

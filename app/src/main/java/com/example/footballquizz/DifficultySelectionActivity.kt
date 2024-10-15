@@ -45,6 +45,14 @@ class DifficultySelectionActivity : AppCompatActivity() {
                     startActivity(Intent(this, MainActivity::class.java))
                     true
                 }
+                R.id.nav_history -> {
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                    true
+                }
+                R.id.nav_ranking -> {
+                    startActivity(Intent(this, RankingActivity::class.java))
+                    true
+                }
                 else -> false
             }
         }

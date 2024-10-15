@@ -1,5 +1,5 @@
 package com.example.footballquizz
-
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ListView
 import android.widget.TextView
@@ -7,7 +7,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
-
+import com.google.android.material.bottomnavigation.BottomNavigationView
 class RankingActivity : AppCompatActivity() {
 
     private lateinit var firstPlaceName: TextView
@@ -21,15 +21,40 @@ class RankingActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_ranking)
 
+
         // Kết nối với các view trong layout
         firstPlaceName = findViewById(R.id.first_place_name)
         secondPlaceName = findViewById(R.id.second_place_name)
         thirdPlaceName = findViewById(R.id.third_place_name)
         rankingList = findViewById(R.id.ranking_list)
 
+        // Thiết lập BottomNavigationView
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> {
+                    startActivity(Intent(this, DifficultySelectionActivity::class.java))
+                    true
+                }
+                R.id.nav_settings -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
+                R.id.nav_history -> {
+                    startActivity(Intent(this, HistoryActivity::class.java))
+                    true
+                }
+                R.id.nav_home_admin -> {
+                    startActivity(Intent(this, AdminActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
         // Lấy dữ liệu từ Firestore
         loadRankingData()
     }
+
 
     private fun loadRankingData() {
         // Lấy danh sách điểm từ Firestore, sắp xếp theo điểm giảm dần
@@ -58,6 +83,7 @@ class RankingActivity : AppCompatActivity() {
                 val adapter = RankingAdapter(this, rankingListItems)
                 rankingList.adapter = adapter
             }
+
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to load ranking: $e", Toast.LENGTH_SHORT).show()
             }

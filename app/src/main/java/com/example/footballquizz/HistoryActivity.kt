@@ -25,12 +25,24 @@ class HistoryActivity : AppCompatActivity() {
         listViewHistory = findViewById(R.id.listViewHistory)
 
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+        bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
 
-                R.id.nav_history -> {
+                R.id.nav_home -> {
                     // Chuyển đến trang DifficultySelectionActivity
-                    startActivity(Intent(this, HistoryActivity::class.java))
+                    startActivity(Intent(this, DifficultySelectionActivity::class.java))
+                    true
+                }
+                R.id.nav_settings -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
+                R.id.nav_ranking -> {
+                    startActivity(Intent(this, RankingActivity::class.java))
+                    true
+                }
+                R.id.nav_home_admin -> {
+                    startActivity(Intent(this, AdminActivity::class.java))
                     true
                 }
                 else -> false

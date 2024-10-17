@@ -59,32 +59,33 @@ class RankingActivity : AppCompatActivity() {
     }
 
     private fun loadRankingData() {
-        // Lấy danh sách điểm từ Firestore, sắp xếp theo điểm giảm dần
         db.collection("score")
-            .orderBy("point", Query.Direction.DESCENDING)
-            .limit(10) // Lấy tối đa 10 người chơi
-            .get()
+            .get() // Không sắp xếp từ Firestore vì Firestore đang lưu dưới dạng chuỗi
             .addOnSuccessListener { result ->
-                val rankingListItems = mutableListOf<String>()  // Để chứa các người chơi từ vị trí 4 trở đi
+                val rankingListItems = mutableListOf<Pair<String, Double>>()  // List lưu tên người chơi và điểm số (dạng số)
 
-                var count = 0
                 for (document in result) {
                     val playerName = document.getString("name") ?: "No Name"
-                    val playerPoint = document.getString("point") ?: "0"
+                    val playerPointString = document.getString("point") ?: "0"
+                    val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0 // Chuyển điểm số từ chuỗi sang số
 
-                    count++
-                    when (count) {
-                        1 -> firstPlaceName.text = "$playerName - $playerPoint pts"
-                        2 -> secondPlaceName.text = "$playerName - $playerPoint pts"
-                        3 -> thirdPlaceName.text = "$playerName - $playerPoint pts"
-                        else -> {
-                            // Thêm người chơi từ vị trí 4 trở đi vào danh sách
-                            val playerTextView = TextView(this)
-                            playerTextView.text = "$count. $playerName - $playerPoint pts"
-                            playerTextView.setPadding(16, 16, 16, 16)
-                            rankingListLayout.addView(playerTextView)
-                        }
-                    }
+                    rankingListItems.add(Pair(playerName, playerPoint)) // Thêm vào danh sách dưới dạng cặp (tên, điểm số)
+                }
+
+                // Sắp xếp danh sách theo điểm số (từ cao xuống thấp)
+                rankingListItems.sortByDescending { it.second }
+
+                // Hiển thị top 3 người chơi
+                if (rankingListItems.isNotEmpty()) firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second} pts"
+                if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second} pts"
+                if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second} pts"
+
+                // Hiển thị những người chơi còn lại
+                for (i in 3 until rankingListItems.size) {
+                    val playerTextView = TextView(this)
+                    playerTextView.text = "${i + 1}. ${rankingListItems[i].first} - ${rankingListItems[i].second} pts"
+                    playerTextView.setPadding(16, 16, 16, 16)
+                    rankingListLayout.addView(playerTextView)
                 }
             }
             .addOnFailureListener { e ->

@@ -58,8 +58,6 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-
-
     <!-- Divider -->
     <View
         android:layout_width="1dp"
@@ -83,7 +81,6 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-
   </LinearLayout>
 
   <!-- "Let's Play" Title -->
@@ -98,53 +95,50 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/rank_section" />
 
-  <!-- Game Mode Buttons as GridLayout -->
-  <GridLayout
+  <!-- Game Mode Buttons in Vertical Layout -->
+  <LinearLayout
       android:id="@+id/game_modes"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="44dp"
-      android:alignmentMode="alignMargins"
-      android:columnCount="2"
-      android:rowCount="2"
+      android:orientation="vertical"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHorizontal_bias="0.489"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@+id/lets_play">
 
     <!-- Nút Dễ -->
     <Button
         android:id="@+id/btnEasy"
-        android:layout_width="100dp"
+        android:layout_width="200dp"
         android:layout_height="100dp"
         android:layout_margin="8dp"
         android:text="Dễ"
-        android:textSize="18sp"
+        android:textSize="30sp"
         android:backgroundTint="#4CAF50"
         android:textColor="#FFFFFF" />
 
     <!-- Nút Trung Bình -->
     <Button
         android:id="@+id/btnMedium"
-        android:layout_width="100dp"
+        android:layout_width="200dp"
         android:layout_height="100dp"
         android:layout_margin="8dp"
         android:text="Trung Bình"
-        android:textSize="18sp"
+        android:textSize="30sp"
         android:backgroundTint="#FFC107"
         android:textColor="#FFFFFF" />
 
     <!-- Nút Khó -->
     <Button
         android:id="@+id/btnHard"
-        android:layout_width="100dp"
+        android:layout_width="200dp"
         android:layout_height="100dp"
         android:layout_margin="8dp"
         android:text="Khó"
-        android:textSize="18sp"
+        android:textSize="30sp"
         android:backgroundTint="#F44336"
         android:textColor="#FFFFFF" />
-  </GridLayout>
+  </LinearLayout>
 
   <!-- Bottom Navigation -->
   <com.google.android.material.bottomnavigation.BottomNavigationView

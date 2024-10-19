@@ -23,14 +23,12 @@
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:text="Quiz Football App"
-            android:textSize="24sp"
-            android:textStyle="bold"
-
-
-            android:textColor="@android:color/black"
-
-            android:layout_gravity="center_horizontal" />
+            android:textColor="@android:color/holo_red_dark"
+            android:layout_marginTop="60dp"
+            android:textSize="40sp"
+            android:textStyle="bold" />
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/toolbar"
@@ -69,6 +67,15 @@
         android:padding="@dimen/activity_horizontal_margin"
         tools:ignore="MissingConstraints">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_marginTop="200dp"
+            android:padding="20dp"
+            android:background="@android:color/white"
+            >
         <!-- Email Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
@@ -83,7 +90,8 @@
                 android:hint="@string/hint_email"
                 android:inputType="textEmailAddress"
                 android:textColor="@android:color/black"
-                android:textColorHint="@android:color/black" />
+                android:textColorHint="@android:color/black"
+                android:textStyle="bold"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Password Input -->
@@ -98,7 +106,8 @@
                 android:hint="@string/hint_password"
                 android:inputType="textPassword"
                 android:textColor="@android:color/black"
-                android:textColorHint="@android:color/black" />
+                android:textColorHint="@android:color/black"
+                android:textStyle="bold"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Nút Đăng nhập -->
@@ -107,10 +116,11 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-
-            android:background="@null"
             android:text="@string/btn_login"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:backgroundTint="@color/bg_main"/>
 
         <!-- Nút Đăng ký (Mới thêm vào) -->
         <Button
@@ -118,10 +128,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@null"
             android:text="@string/btn_link_to_register"
             android:textAllCaps="false"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:backgroundTint="@color/bg_main"/>
 
         <!-- Nút Quên mật khẩu -->
         <Button
@@ -129,10 +141,14 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:background="@null"
             android:text="@string/btn_forgot_password"
             android:textAllCaps="false"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:textSize="15sp"
+            android:backgroundTint="@color/bg_main"/>
+
+    </LinearLayout>
     </LinearLayout>
 
     <!-- ProgressBar -->

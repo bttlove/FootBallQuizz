@@ -5,14 +5,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:elevation="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,9 +26,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimaryDark"
-            app:layout_scrollFlags="scroll|enterAlways"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+            app:layout_scrollFlags="scroll|enterAlways">
 
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
@@ -52,6 +50,8 @@
             android:hint="@string/hint_email"
             android:inputType="textEmailAddress"
             android:maxLines="1"
+            android:textColor="@color/black"
+            android:textStyle="bold"
             android:singleLine="true" />
 
         <EditText
@@ -61,6 +61,8 @@
             android:hint="@string/hint_new_email"
             android:inputType="textEmailAddress"
             android:maxLines="1"
+            android:textColor="@color/black"
+            android:textStyle="bold"
             android:singleLine="true" />
 
         <EditText
@@ -70,6 +72,8 @@
             android:focusableInTouchMode="true"
             android:hint="@string/prompt_password"
             android:imeActionId="@+id/login"
+            android:textColor="@color/black"
+            android:textStyle="bold"
             android:imeOptions="actionUnspecified"
             android:inputType="textPassword"
             android:maxLines="1"
@@ -86,6 +90,8 @@
             android:imeOptions="actionUnspecified"
             android:inputType="textPassword"
             android:maxLines="1"
+            android:textColor="@color/black"
+            android:textStyle="bold"
             android:singleLine="true"
             tools:ignore="InvalidImeActionId" />
 
@@ -95,10 +101,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/colorPrimaryDark"
             android:text="@string/btn_change"
             android:textColor="@android:color/white"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:backgroundTint="@color/btn_login"/>
 
         <Button
             android:id="@+id/changePass"
@@ -106,7 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/colorPrimaryDark"
+            android:backgroundTint="@color/btn_login"
             android:text="@string/btn_change"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
@@ -117,7 +123,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/colorPrimaryDark"
+            android:backgroundTint="@color/btn_login"
             android:text="@string/btn_send"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
@@ -128,7 +134,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/colorPrimaryDark"
+            android:backgroundTint="@color/btn_login"
             android:text="@string/btn_remove"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
@@ -138,8 +144,9 @@
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="16dp"
             android:text="@string/change_email"
+            android:backgroundTint="@color/bg_main"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 
@@ -149,6 +156,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:backgroundTint="@color/bg_main"
             android:text="@string/change_password"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
@@ -159,6 +167,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:backgroundTint="@color/bg_main"
             android:text="@string/send_password_reset_email"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
@@ -170,6 +179,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="@string/remove_user"
+            android:backgroundTint="@color/bg_main"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 
@@ -179,7 +189,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:background="@color/colorPrimary"
+            android:backgroundTint="@color/bg_main"
             android:text="@string/btn_sign_out"
             android:textColor="@android:color/white"
             android:textStyle="bold" />

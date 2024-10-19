@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ff6861">
+    android:background="@color/btn_login">
 
     <!-- NestedScrollView to wrap content -->
     <androidx.core.widget.NestedScrollView
@@ -25,6 +25,7 @@
                 android:layout_height="wrap_content"
                 android:text="Ranking"
                 android:textSize="32sp"
+                android:textStyle="bold"
                 android:textColor="@color/black"
                 android:gravity="center"
                 android:layout_gravity="center" />
@@ -117,15 +118,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:background="#00bcd4"
+                android:background="@color/input_login"
                 android:orientation="vertical">
 
                 <!-- Example ranking items -->
                 <TextView
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp" />
-
+                    android:layout_height="wrap_content"/>
                 <!-- Add more ranking items as needed -->
 
             </LinearLayout>
@@ -136,8 +135,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Enter Contest"
-                android:backgroundTint="@color/black"
+                android:backgroundTint="@color/bg_main"
                 android:textColor="@color/white"
+                android:textStyle="bold"
                 android:layout_marginTop="24dp" />
 
         </LinearLayout>

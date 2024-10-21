@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+
     implementation(platform("com.google.firebase:firebase-bom:33.3.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-database")
@@ -52,8 +53,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.firebase.auth.ktx)
     implementation(libs.firebase.firestore.ktx)
-    implementation(libs.firebase.storage.ktx)
-    testImplementation(libs.junit)
+  implementation(libs.firebase.storage.ktx)
+  testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     implementation ("com.google.android.material:material:1.9.0")
@@ -61,8 +62,6 @@ dependencies {
     implementation ("androidx.core:core-ktx:1.12.0")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")
-    implementation ("com.google.firebase:firebase-storage:latest_version")
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")
-    implementation ("com.google.firebase:firebase-firestore-ktx:24.7.1")
+
 
 }

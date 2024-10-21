@@ -1,12 +1,16 @@
 package com.example.footballquizz
 
 data class QuizzModel(
+
   val Name: String = "",
   val yearOfBirth: Int = 0,
   val club: String = "",
-  val imageUrl: String = ""
+  val imageUrl: String = "",
+  var id: String? = null
 ){
-     fun getEasyQuestion(): String {
+
+
+  fun getEasyQuestion(): String {
          return "Tên cầu thủ trong ảnh là gì?"
      }
      fun getMediumQuestion(): String {

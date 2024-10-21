@@ -20,6 +20,8 @@
             android:exported="true">
         </activity>
 
+
+
         <!-- Đặt LoginSignupActivity làm activity chính -->
         <activity android:name=".LoginSignupActivity"
             android:exported="true">
@@ -54,5 +56,6 @@
             android:exported="true"/>
         <activity android:name=".ResetPasswordActivity"
             android:exported="true"/>
+        <activity android:name=".PlayerManagementAdmin" />
     </application>
 </manifest>

@@ -70,6 +70,16 @@ class AdminActivity : AppCompatActivity() {
           Toast.makeText(this, "Go to History", Toast.LENGTH_SHORT).show()
           true
         }
+
+        R.id.nav_home_admin -> {
+          Toast.makeText(this, "Go to Home Admin", Toast.LENGTH_SHORT).show()
+          true
+        }
+
+        R.id.nav_player_management -> {
+          Toast.makeText(this, "Go to PlayerManagement", Toast.LENGTH_SHORT).show()
+          true
+        }
         else -> false
       }
     }

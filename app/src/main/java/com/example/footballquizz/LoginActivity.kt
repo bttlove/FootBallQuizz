@@ -26,6 +26,7 @@ class LoginActivity : AppCompatActivity() {
 
         // Initialize Firebase Auth and Firestore
         auth = FirebaseAuth.getInstance()
+        auth.signOut()
         db = FirebaseFirestore.getInstance()
 
         // Set layout for LoginActivity

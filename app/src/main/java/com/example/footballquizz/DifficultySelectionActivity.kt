@@ -1,5 +1,4 @@
 package com.example.footballquizz
-
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -8,6 +7,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import android.widget.ImageView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.bumptech.glide.Glide
 
 class DifficultySelectionActivity : AppCompatActivity() {
 
@@ -34,6 +36,19 @@ class DifficultySelectionActivity : AppCompatActivity() {
                 // Hiển thị tên người dùng trong phần chào mừng
                 val greetingTextView: TextView = findViewById(R.id.greeting)
                 greetingTextView.text = "Hello, $username!"
+            }
+            // Lấy ảnh đại diện từ Firestore
+            val userId = currentUser.uid
+            val db = FirebaseFirestore.getInstance()
+            db.collection("auths").document(userId).get().addOnSuccessListener { document ->
+                if (document != null) {
+                    val imageUrl = document.getString("image_url")
+                    if (imageUrl != null && imageUrl.isNotEmpty()) {
+                        val profileImageView: ImageView = findViewById(R.id.profile_icon)
+                        // Sử dụng Glide để load ảnh
+                        Glide.with(this).load(imageUrl).into(profileImageView)
+                    }
+                }
             }
         }
 

@@ -1,5 +1,6 @@
 package com.example.footballquizz
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -58,28 +59,29 @@ class AdminActivity : AppCompatActivity() {
     val bottomNavigation: BottomNavigationView = findViewById(R.id.admin_bottom_navigation)
     bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
-        R.id.nav_settings -> {
-          Toast.makeText(this, "Go to Settings", Toast.LENGTH_SHORT).show()
-          true
-        }
-        R.id.nav_ranking -> {
-          Toast.makeText(this, "Go to Ranking", Toast.LENGTH_SHORT).show()
-          true
-        }
-        R.id.nav_history -> {
-          Toast.makeText(this, "Go to History", Toast.LENGTH_SHORT).show()
-          true
-        }
-
         R.id.nav_home_admin -> {
           Toast.makeText(this, "Go to Home Admin", Toast.LENGTH_SHORT).show()
           true
         }
-
         R.id.nav_player_management -> {
-          Toast.makeText(this, "Go to PlayerManagement", Toast.LENGTH_SHORT).show()
+          val intent = Intent(this, PlayerManagementAdmin::class.java)
+          startActivity(intent)
           true
         }
+
+        R.id.nav_player_management -> {
+          Toast.makeText(this, "Go to Player Management", Toast.LENGTH_SHORT).show()
+          true
+        }
+        R.id.nav_history -> {
+        Toast.makeText(this, "Go to Home Histoery", Toast.LENGTH_SHORT).show()
+        true
+      }
+        R.id.nav_settings -> {
+          Toast.makeText(this, "Go to Setting", Toast.LENGTH_SHORT).show()
+          true
+        }
+
         else -> false
       }
     }

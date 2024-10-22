@@ -81,6 +81,10 @@ class MainActivity : AppCompatActivity() {
                     startActivity(Intent(this, AdminActivity::class.java))
                     true
                 }
+                R.id.nav_player_management -> {
+                    startActivity(Intent(this, PlayerManagementAdmin::class.java))
+                    true
+                }
                 else -> false
             }
         }

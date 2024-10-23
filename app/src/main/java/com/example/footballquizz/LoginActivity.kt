@@ -10,6 +10,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.*
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var inputEmail: EditText
@@ -70,9 +72,40 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            checkUserRole(email)
+            checkBlockStatus(email) // Kiểm tra trạng thái chặn trước khi xử lý đăng nhập
         }
     }
+
+    // Hàm kiểm tra trạng thái chặn của người chơi
+    private fun checkBlockStatus(email: String) {
+        db.collection("login").document(email).get()
+            .addOnSuccessListener { document ->
+                val blockUntil = document.getString("block_until")
+                if (blockUntil != null) {
+                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val blockDate = sdf.parse(blockUntil)
+                    val currentDate = Date()
+
+                    // So sánh thời gian hiện tại và thời gian hết chặn
+                    if (currentDate.before(blockDate)) {
+                        val daysLeft = ((blockDate.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
+                        Toast.makeText(this, "Bạn bị chặn trong $daysLeft ngày.", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    } else {
+                        // Nếu hết thời gian chặn, tiếp tục kiểm tra vai trò người dùng
+                        checkUserRole(email)
+                    }
+                } else {
+                    // Nếu không có chặn, tiếp tục kiểm tra vai trò người dùng
+                    checkUserRole(email)
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Lỗi khi kiểm tra trạng thái chặn: $e", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
 
     // Kiểm tra vai trò của người dùng
     private fun checkUserRole(email: String) {
@@ -80,6 +113,21 @@ class LoginActivity : AppCompatActivity() {
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
                     val role = document.getString("role")
+                    val blockUntil = document.getString("block_until")
+
+                    if (blockUntil != null) {
+                        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                        val blockDate = sdf.parse(blockUntil)
+                        val currentDate = Date()
+
+                        // Nếu người dùng đang bị chặn
+                        if (currentDate.before(blockDate)) {
+                            val daysLeft = ((blockDate.time - currentDate.time) / (1000 * 60 * 60 * 24)).toInt()
+                            Toast.makeText(this, "Tài khoản của bạn đã bị chặn trong $daysLeft ngày.", Toast.LENGTH_SHORT).show()
+                            return@addOnSuccessListener
+                        }
+                    }
+
                     if (role == "admin") {
                         // Chuyển đến HomeAdminActivity nếu người dùng là admin
                         startActivity(Intent(this@LoginActivity, HomeAdminActivity::class.java))
@@ -96,6 +144,7 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
+    // Nhắc người dùng nhập mật khẩu và xử lý đăng nhập
     private fun promptForPassword(email: String) {
         val password = inputPassword.text.toString()
 
@@ -124,6 +173,7 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
+    // Lưu dữ liệu đăng nhập sau khi đăng nhập thành công
     private fun saveLoginData(email: String) {
         val currentDateTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")

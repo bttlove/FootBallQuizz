@@ -54,6 +54,7 @@
         android:src="@drawable/cup_image" />
 
     <TextView
+        android:id="@+id/rank_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -77,6 +78,7 @@
         android:src="@drawable/point_image" />
 
     <TextView
+        android:id="@+id/points_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

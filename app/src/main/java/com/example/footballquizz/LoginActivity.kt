@@ -42,13 +42,10 @@ class LoginActivity : AppCompatActivity() {
 
         // Kiểm tra nếu người dùng đã đăng nhập
         if (auth.currentUser != null) {
-            // Lấy email người dùng hiện tại từ FirebaseAuth
             val currentEmail = auth.currentUser?.email
             if (currentEmail != null) {
-                // Kiểm tra vai trò người dùng trong Firestore
                 checkUserRole(currentEmail)
             } else {
-                // Nếu không lấy được email, yêu cầu đăng nhập lại
                 auth.signOut()
                 Toast.makeText(this, "Session expired. Please log in again.", Toast.LENGTH_SHORT).show()
             }
@@ -68,13 +65,11 @@ class LoginActivity : AppCompatActivity() {
         btnLogin.setOnClickListener {
             val email = inputEmail.text.toString()
 
-            // Kiểm tra nếu email bị bỏ trống
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(applicationContext, "Enter email address!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Kiểm tra xem người dùng có phải admin không bằng cách tra trong Firestore
             checkUserRole(email)
         }
     }
@@ -86,15 +81,13 @@ class LoginActivity : AppCompatActivity() {
                 if (document != null && document.exists()) {
                     val role = document.getString("role")
                     if (role == "admin") {
-                        // Nếu là admin, chuyển người dùng đến AdminActivity
-                        startActivity(Intent(this@LoginActivity, AdminActivity::class.java))
-                        finish() // Đóng LoginActivity
+                        // Chuyển đến HomeAdminActivity nếu người dùng là admin
+                        startActivity(Intent(this@LoginActivity, HomeAdminActivity::class.java))
+                        finish()
                     } else {
-                        // Nếu không phải admin, kiểm tra đăng nhập với Authentication như người dùng bình thường
                         promptForPassword(email)
                     }
                 } else {
-                    // Nếu không tìm thấy trong Firestore, xem như người dùng bình thường
                     promptForPassword(email)
                 }
             }
@@ -103,11 +96,9 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    // Xử lý đăng nhập người dùng thông thường
     private fun promptForPassword(email: String) {
         val password = inputPassword.text.toString()
 
-        // Kiểm tra nếu mật khẩu bị bỏ trống
         if (TextUtils.isEmpty(password)) {
             Toast.makeText(applicationContext, "Enter password!", Toast.LENGTH_SHORT).show()
             return
@@ -115,42 +106,35 @@ class LoginActivity : AppCompatActivity() {
 
         progressBar.visibility = View.VISIBLE
 
-        // Đăng nhập với Firebase Authentication cho người dùng bình thường
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener(this@LoginActivity) { task ->
                 progressBar.visibility = View.GONE
 
                 if (!task.isSuccessful) {
-                    // Nếu đăng nhập thất bại
                     if (password.length < 6) {
                         inputPassword.error = getString(R.string.minimum_password)
                     } else {
                         Toast.makeText(this@LoginActivity, getString(R.string.auth_failed), Toast.LENGTH_LONG).show()
                     }
                 } else {
-                    // Đăng nhập thành công, điều hướng đến DifficultySelectionActivity
                     startActivity(Intent(this@LoginActivity, DifficultySelectionActivity::class.java))
-                    finish() // Đóng LoginActivity
-                    saveLoginData(email) // Lưu thông tin đăng nhập
+                    finish()
+                    saveLoginData(email)
                 }
             }
     }
 
-    // Lưu thông tin đăng nhập vào Firestore
     private fun saveLoginData(email: String) {
-        // Lấy thời gian hiện tại
         val currentDateTime = LocalDateTime.now()
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
-        // Tạo dữ liệu đăng nhập
         val user = hashMapOf(
             "e-mail" to email,
-            "role" to "user", // Có thể cần cập nhật đúng role thực sự nếu cần
+            "role" to "user",
             "start time" to currentDateTime.format(formatter),
-            "end time" to currentDateTime.format(formatter) // Sử dụng cùng thời gian cho lúc bắt đầu, có thể thay đổi sau
+            "end time" to currentDateTime.format(formatter)
         )
 
-        // Thêm thông tin đăng nhập vào Firestore
         db.collection("login")
             .add(user)
             .addOnSuccessListener {

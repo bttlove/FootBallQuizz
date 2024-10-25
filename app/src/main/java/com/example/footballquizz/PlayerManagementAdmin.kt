@@ -4,12 +4,15 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
@@ -52,37 +55,60 @@ class PlayerManagementAdmin : AppCompatActivity() {
     }
 
     private fun loadPlayerData() {
-        db.collection("login")  // Collection tên 'login'
-            .orderBy("start time", com.google.firebase.firestore.Query.Direction.DESCENDING)  // Sắp xếp theo 'start time' giảm dần
+        db.collection("auths")  // Collection tên 'auths'
+            .orderBy("date-time", com.google.firebase.firestore.Query.Direction.DESCENDING)  // Sắp xếp theo 'date-time' giảm dần
             .limit(10)  // Giới hạn 10 kết quả mới nhất
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
-                    val email = document.getString("e-mail") ?: "No Email"  // Lấy 'email'
-                    val startTime = document.getString("start time") ?: "Unknown"
-                    val endTime = document.getString("end time") ?: "Unknown"
+                    val email = document.getString("email") ?: "No Email"  // Lấy 'email'
+                    val dateTime = document.getString("date-time") ?: "Unknown"
+                    val imageUrl = document.getString("image_url") ?: ""
+                    val role = document.getString("role") ?: "user"
 
-                    // Định dạng thời gian
-                    val formattedLoginTime = formatDateTime(startTime)
-                    val formattedLogoutTime = formatDateTime(endTime)
+                    // Định dạng thời gian (nếu cần)
+                    val formattedDateTime = formatDateTime(dateTime)
 
                     // Tạo một TableRow mới cho mỗi người chơi
                     val playerRow = TableRow(this)
 
-                    // Tạo TextView cho từng cột
+                    // Tạo ImageView cho ảnh người chơi
+                    val playerImageView = ImageView(this).apply {
+                        layoutParams = TableRow.LayoutParams(0, 150, 1f)  // Giới hạn chiều cao của ảnh
+                        scaleType = ImageView.ScaleType.CENTER_CROP  // Giữ tỷ lệ hình ảnh
+                        adjustViewBounds = true
+
+                        if (imageUrl.isNotEmpty()) {
+                            val requestOptions = RequestOptions()
+                                .circleCrop()  // Bo tròn ảnh
+                                .override(150, 150)  // Giới hạn kích thước
+
+                            Glide.with(this@PlayerManagementAdmin)
+                                .load(imageUrl)
+                                .apply(requestOptions)
+                                .into(this)
+                        } else {
+//                            setImageResource(R.drawable.default_profile_image)  // Ảnh mặc định
+                        }
+                    }
+
+
+                    // Tạo TextView cho email
                     val emailTextView = TextView(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
                         text = email
                     }
 
-                    val startTimeTextView = TextView(this).apply {
+                    // Tạo TextView cho thời gian đăng nhập
+                    val dateTimeTextView = TextView(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                        text = formattedLoginTime
+                        text = formattedDateTime
                     }
 
-                    val endTimeTextView = TextView(this).apply {
+                    // Tạo TextView cho vai trò (role)
+                    val roleTextView = TextView(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                        text = formattedLogoutTime
+                        text = role
                     }
 
                     // Thêm Button "Chặn người chơi"
@@ -94,10 +120,11 @@ class PlayerManagementAdmin : AppCompatActivity() {
                         }
                     }
 
-                    // Thêm các TextView và Button vào TableRow
+                    // Thêm các View vào TableRow
+                    playerRow.addView(playerImageView)
                     playerRow.addView(emailTextView)
-                    playerRow.addView(startTimeTextView)
-                    playerRow.addView(endTimeTextView)
+                    playerRow.addView(dateTimeTextView)
+                    playerRow.addView(roleTextView)
                     playerRow.addView(blockButton)
 
                     // Thêm TableRow vào TableLayout
@@ -109,6 +136,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
                 Toast.makeText(this, "Không thể tải dữ liệu người chơi: $e", Toast.LENGTH_SHORT).show()
             }
     }
+
 
 
     // Hiển thị dialog để chặn người chơi

@@ -161,7 +161,7 @@ class AdminActivity : AppCompatActivity() {
   // Filter players by name or club
   private fun filterPlayers(query: String) {
     val filteredList = playerList.filter {
-      it.Name.contains(query, ignoreCase = true) || it.club.contains(query, ignoreCase = true)
+      it.name.contains(query, ignoreCase = true) || it.club.contains(query, ignoreCase = true)
     }
     playerAdapter.updateData(filteredList)
   }
@@ -179,13 +179,13 @@ class AdminActivity : AppCompatActivity() {
       .setTitle("Thêm cầu thủ mới")
       .setView(dialogView)
       .setPositiveButton("Thêm") { _, _ ->
-        val Name = playerNameEditText.text.toString()
+        val name = playerNameEditText.text.toString()
         val club = playerClubEditText.text.toString()
         val year = playerYearEditText.text.toString()
         val imageUrl = playerImageUrlEditText.text.toString()
 
-        if (Name.isNotEmpty() && club.isNotEmpty() && year.isNotEmpty() && imageUrl.isNotEmpty()) {
-          addPlayerToFirebase(Name, club, year, imageUrl)
+        if (name.isNotEmpty() && club.isNotEmpty() && year.isNotEmpty() && imageUrl.isNotEmpty()) {
+          addPlayerToFirebase(name, club, year, imageUrl)
         } else {
           Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
         }
@@ -195,13 +195,13 @@ class AdminActivity : AppCompatActivity() {
   }
 
   // Add player to Firebase
-  private fun addPlayerToFirebase(Name: String, club: String, yearOfBirth: String, imageUrl: String) {
+  private fun addPlayerToFirebase(name: String, club: String, yearOfBirth: String, imageUrl: String) {
     val database = FirebaseDatabase.getInstance().getReference("players")
     val playerId = database.push().key
 
     // Chỉ thêm các thuộc tính mà bạn đã khai báo trong QuizzModel
     val player = QuizzModel(
-      Name = Name,
+      name = name,
       yearOfBirth = yearOfBirth.toInt(), // Chuyển đổi năm sinh từ String sang Int
       club = club,
       imageUrl = imageUrl
@@ -242,7 +242,7 @@ class AdminActivity : AppCompatActivity() {
     val playerImageUrlEditText: EditText = dialogView.findViewById(R.id.etPlayerImageUrl)
 
     // Pre-fill the fields with the current player's data
-    playerNameEditText.setText(player.Name)
+    playerNameEditText.setText(player.name)
     playerClubEditText.setText(player.club)
     playerYearEditText.setText(player.yearOfBirth.toString())
     playerImageUrlEditText.setText(player.imageUrl)
@@ -251,13 +251,13 @@ class AdminActivity : AppCompatActivity() {
       .setTitle("Chỉnh sửa cầu thủ")
       .setView(dialogView)
       .setPositiveButton("Lưu") { _, _ ->
-        val Name = playerNameEditText.text.toString()
+        val name = playerNameEditText.text.toString()
         val club = playerClubEditText.text.toString()
         val year = playerYearEditText.text.toString()
         val imageUrl = playerImageUrlEditText.text.toString()
 
-        if (Name.isNotEmpty() && club.isNotEmpty() && year.isNotEmpty() && imageUrl.isNotEmpty()) {
-          updatePlayerInFirebase(player.id!!, Name, club, year, imageUrl)
+        if (name.isNotEmpty() && club.isNotEmpty() && year.isNotEmpty() && imageUrl.isNotEmpty()) {
+          updatePlayerInFirebase(player.id!!, name, club, year, imageUrl)
         } else {
           Toast.makeText(this, "Vui lòng điền đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
         }
@@ -267,11 +267,11 @@ class AdminActivity : AppCompatActivity() {
   }
 
   // Update player in Firebase
-  private fun updatePlayerInFirebase(id: String, Name: String, club: String, year: String, imageUrl: String) {
+  private fun updatePlayerInFirebase(id: String, name: String, club: String, year: String, imageUrl: String) {
     val database = FirebaseDatabase.getInstance().getReference("players").child(id)
 
     val updatedPlayer = QuizzModel(
-      Name = Name,
+      name = name,
       yearOfBirth = year.toInt(),
       club = club,
       imageUrl = imageUrl
@@ -280,6 +280,11 @@ class AdminActivity : AppCompatActivity() {
     database.setValue(updatedPlayer)
       .addOnSuccessListener {
         Toast.makeText(this, "Cập nhật cầu thủ thành công!", Toast.LENGTH_SHORT).show()
+        val index = playerList.indexOfFirst { it.id == id }
+        if (index != -1) {
+          playerList[index] = updatedPlayer
+          playerAdapter.notifyItemChanged(index)
+        }
       }
       .addOnFailureListener {
         Toast.makeText(this, "Cập nhật cầu thủ thất bại!", Toast.LENGTH_SHORT).show()

@@ -110,19 +110,19 @@ class QuizActivity : AppCompatActivity() {
     // Create question and answers based on difficulty
     when (difficulty) {
       "easy" -> {
-        tvQuestion.text = "Cầu thủ ${player.Name} này thuộc câu lạc bộ nào?"
+        tvQuestion.text = "Cầu thủ ${player.name} này thuộc câu lạc bộ nào?"
         correctAnswer = player.club
-        setupAnswerOptions(player.club, player.Name, player.yearOfBirth.toString())
+        setupAnswerOptions(player.club, player.name, player.yearOfBirth.toString())
       }
       "medium" -> {
         tvQuestion.text = "Cầu thủ này tên gì?"
-        correctAnswer = player.Name
-        setupAnswerOptions(player.Name, player.club, player.yearOfBirth.toString())
+        correctAnswer = player.name
+        setupAnswerOptions(player.name, player.club, player.yearOfBirth.toString())
       }
       "hard" -> {
-        tvQuestion.text = "Cầu thủ ${player.Name} này sinh năm bao nhiêu?"
+        tvQuestion.text = "Cầu thủ ${player.name} này sinh năm bao nhiêu?"
         correctAnswer = player.yearOfBirth.toString()
-        setupAnswerOptions(player.yearOfBirth.toString(), player.club, player.Name)
+        setupAnswerOptions(player.yearOfBirth.toString(), player.club, player.name)
       }
     }
 
@@ -134,7 +134,7 @@ class QuizActivity : AppCompatActivity() {
   private fun setupAnswerOptions(correct: String, wrong1: String, wrong2: String) {
     val answers = mutableListOf(correct)
     val wrongAnswers = players.filter {
-      it.Name != correct &&
+      it.name != correct &&
               it.club != wrong1 &&
               it.yearOfBirth.toString() != wrong2
     }.shuffled().take(3)
@@ -142,7 +142,7 @@ class QuizActivity : AppCompatActivity() {
     answers.addAll(wrongAnswers.map {
       when (difficulty) {
         "easy" -> it.club
-        "medium" -> it.Name
+        "medium" -> it.name
         "hard" -> it.yearOfBirth.toString()
         else -> ""
       }

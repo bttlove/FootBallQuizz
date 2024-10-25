@@ -41,7 +41,7 @@ class PlayerAdapter(
     private val playerClubTextView: TextView = itemView.findViewById(R.id.playerClubTextView)
 
     fun bind(player: QuizzModel) {
-      playerNameTextView.text = player.Name
+      playerNameTextView.text = player.name
       playerYearTextView.text = player.yearOfBirth.toString()
       playerClubTextView.text = player.club
 

@@ -61,6 +61,8 @@ dependencies {
     implementation (libs.androidx.appcompat.v131)
     implementation ("androidx.core:core-ktx:1.12.0")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
+    implementation ("androidx.core:core:1.10.1")
+    implementation ("androidx.appcompat:appcompat:1.7.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")
 
 

@@ -64,16 +64,36 @@ class LoginActivity : AppCompatActivity() {
         }
 
         // Login button click listener
+        // Login button click listener
         btnLogin.setOnClickListener {
             val email = inputEmail.text.toString()
+            val password = inputPassword.text.toString()
 
             if (TextUtils.isEmpty(email)) {
                 Toast.makeText(applicationContext, "Enter email address!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            checkBlockStatus(email) // Kiểm tra trạng thái chặn trước khi xử lý đăng nhập
+            if (TextUtils.isEmpty(password)) {
+                Toast.makeText(applicationContext, "Enter password!", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            // Xác thực mật khẩu trước
+            progressBar.visibility = View.VISIBLE
+            auth.signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(this@LoginActivity) { task ->
+                    progressBar.visibility = View.GONE
+                    if (task.isSuccessful) {
+                        // Nếu xác thực thành công, mới kiểm tra vai trò người dùng
+                        checkUserRole(email)
+                    } else {
+                        // Hiển thị lỗi nếu xác thực thất bại
+                        Toast.makeText(this@LoginActivity, "Authentication failed!", Toast.LENGTH_LONG).show()
+                    }
+                }
         }
+
     }
 
     // Hàm kiểm tra trạng thái chặn của người chơi

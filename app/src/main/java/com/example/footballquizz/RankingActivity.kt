@@ -2,7 +2,9 @@ package com.example.footballquizz
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -15,8 +17,14 @@ class RankingActivity : AppCompatActivity() {
     private lateinit var secondPlaceName: TextView
     private lateinit var thirdPlaceName: TextView
     private lateinit var rankingListLayout: LinearLayout
+    private lateinit var nextPageButton: Button
+    private lateinit var previousPageButton: Button
 
     private val db = FirebaseFirestore.getInstance()
+    private var currentPage = 0
+    private val itemsPerPage = 10
+    private var rankingListItems: MutableList<Pair<String, Double>> = mutableListOf() // Thay đổi đây
+    private lateinit var pageNumberTextView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +35,9 @@ class RankingActivity : AppCompatActivity() {
         secondPlaceName = findViewById(R.id.second_place_name)
         thirdPlaceName = findViewById(R.id.third_place_name)
         rankingListLayout = findViewById(R.id.ranking_list)
+        nextPageButton = findViewById(R.id.nextPageButton) // Thêm nút trang tiếp theo
+        previousPageButton = findViewById(R.id.prevPageButton) // Thêm nút trang trước
+        pageNumberTextView = findViewById(R.id.pageNumberTextView)
 
         // Thiết lập BottomNavigationView
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
@@ -52,6 +63,19 @@ class RankingActivity : AppCompatActivity() {
             }
         }
 
+        // Thiết lập sự kiện cho các nút điều hướng trang
+        nextPageButton.setOnClickListener {
+            currentPage++
+            loadRankingData()
+        }
+
+        previousPageButton.setOnClickListener {
+            if (currentPage > 0) {
+                currentPage--
+                loadRankingData()
+            }
+        }
+
         // Lấy dữ liệu từ Firestore
         loadRankingData()
     }
@@ -60,35 +84,64 @@ class RankingActivity : AppCompatActivity() {
         db.collection("score")
             .get()
             .addOnSuccessListener { result ->
-                val rankingListItems = mutableListOf<Pair<String, Double>>()  // List lưu tên người chơi và điểm số (dạng số)
+                rankingListItems.clear() // Xóa danh sách hiện tại trước khi thêm mới
 
                 for (document in result) {
                     val playerName = document.getString("name") ?: "No Name"
                     val playerPointString = document.getString("point") ?: "0"
-                    val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0 // Chuyển điểm số từ chuỗi sang số
+                    val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
 
-                    rankingListItems.add(Pair(playerName, playerPoint)) // Thêm vào danh sách dưới dạng cặp (tên, điểm số)
+                    rankingListItems.add(Pair(playerName, playerPoint))
                 }
 
-                // Sắp xếp danh sách theo điểm số (từ cao xuống thấp)
                 rankingListItems.sortByDescending { it.second }
-
-                // Hiển thị top 3 người chơi
-                if (rankingListItems.isNotEmpty()) firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second} pts"
-                if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second} pts"
-                if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second} pts"
-
-                // Hiển thị những người chơi còn lại
-                for (i in 3 until rankingListItems.size) {
-                    val playerTextView = TextView(this)
-                    playerTextView.text = "${i + 1}. ${rankingListItems[i].first} - ${rankingListItems[i].second} pts"
-                    playerTextView.setPadding(16, 16, 16, 16)
-                    rankingListLayout.addView(playerTextView)
-                }
+                updateRankingUI()
+                pageNumberTextView.text = "Page $currentPage"
             }
 
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Failed to load ranking: $e", Toast.LENGTH_SHORT).show()
             }
+    }
+
+    private fun updateRankingUI() {
+        rankingListLayout.removeAllViews() // Xóa các hàng hiện tại trước khi cập nhật
+
+        // Hiển thị top 3 người chơi
+        if (rankingListItems.isNotEmpty()) firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second} point"
+        if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second} point"
+        if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second} point"
+
+        // Tính toán chỉ số bắt đầu và kết thúc cho trang hiện tại
+        val startIndex = currentPage * itemsPerPage + 3 // Bắt đầu từ mục thứ 4
+        val endIndex = minOf(startIndex + itemsPerPage, rankingListItems.size)
+
+        for (i in startIndex until endIndex) {
+            val tableRow = TableRow(this)
+            tableRow.layoutParams = TableRow.LayoutParams(
+                TableRow.LayoutParams.MATCH_PARENT,
+                TableRow.LayoutParams.WRAP_CONTENT
+            )
+
+            val playerNameTextView = TextView(this)
+            playerNameTextView.text = rankingListItems[i].first
+            playerNameTextView.setPadding(8, 8, 8, 8)
+            playerNameTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+
+            val playerPointTextView = TextView(this)
+            playerPointTextView.text = rankingListItems[i].second.toString()
+            playerPointTextView.setPadding(8, 8, 8, 8)
+            playerPointTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            playerPointTextView.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_END
+
+            tableRow.addView(playerNameTextView)
+            tableRow.addView(playerPointTextView)
+
+            rankingListLayout.addView(tableRow)
+        }
+
+        // Ẩn hoặc hiện nút "Previous" và "Next" tùy thuộc vào trang hiện tại
+        previousPageButton.isEnabled = currentPage > 0
+        nextPageButton.isEnabled = endIndex < rankingListItems.size
     }
 }

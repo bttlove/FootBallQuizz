@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -40,16 +41,26 @@ class DifficultySelectionActivity : AppCompatActivity() {
                 // Lấy ảnh đại diện từ Firestore
                 val userId = currentUser.uid
                 val db = FirebaseFirestore.getInstance()
-
+                val profileImageView: ImageView = findViewById(R.id.profile_icon)
                 // Lấy ảnh đại diện từ collection "auths"
                 db.collection("auths").document(userId).get().addOnSuccessListener { document ->
                     if (document != null) {
                         val imageUrl = document.getString("image_url")
                         if (imageUrl != null && imageUrl.isNotEmpty()) {
                             val profileImageView: ImageView = findViewById(R.id.profile_icon)
-                            // Sử dụng Glide để load ảnh
-                            Glide.with(this).load(imageUrl).into(profileImageView)
+                            val requestOptions = RequestOptions().circleCrop()
+                            // Use Glide to load the image with the defined RequestOptions
+                            Glide.with(this)
+                                .load(imageUrl)
+                                .apply(requestOptions)
+                                .into(profileImageView)
                         }
+
+                    }
+                    profileImageView.setOnClickListener {
+                        val intent = Intent(this@DifficultySelectionActivity, MainActivity::class.java)
+                        intent.putExtra("USER_EMAIL", email) // Pass the email to ProfileActivity
+                        startActivity(intent)
                     }
                 }
 

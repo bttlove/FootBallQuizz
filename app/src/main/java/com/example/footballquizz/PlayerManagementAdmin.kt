@@ -1,5 +1,4 @@
 package com.example.footballquizz
-
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -40,11 +39,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
         nextPageButton = findViewById(R.id.nextPageButton)
         prevPageButton = findViewById(R.id.prevPageButton)
         pageNumberTextView = findViewById(R.id.pageNumberTextView)
-
-
-
-
-
         val bottomNavigation: BottomNavigationView = findViewById(R.id.admin_bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -52,12 +46,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     startActivity(Intent(this, AdminActivity::class.java))
                     true
                 }
-                R.id.nav_history -> {
-                    startActivity(Intent(this, HistoryActivity::class.java))
-                    true
-                }
-                R.id.nav_settings -> {
-                    startActivity(Intent(this, MainActivity::class.java))
+                R.id.nav_ranking -> {
+                    startActivity(Intent(this, AdminRankingActivity::class.java))
                     true
                 }
                 else -> false
@@ -95,8 +85,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     val dateTime = document.getString("date-time") ?: "Unknown"
                     val imageUrl = document.getString("image_url") ?: ""
                     val formattedDateTime = formatDateTime(dateTime)
-
                     val playerRow = TableRow(this)
+
                     val playerImageView = ImageView(this).apply {
                         layoutParams = TableRow.LayoutParams(0, 150, 1f)
                         scaleType = ImageView.ScaleType.CENTER_CROP
@@ -245,20 +235,20 @@ class PlayerManagementAdmin : AppCompatActivity() {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             text = email
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-            setPadding(8, 8, 8, 8)  // Thêm padding cho TextView email
+            setPadding(4, 4, 4, 4)  // Thêm padding cho TextView email
         }
 
         val dateTimeTextView = TextView(this).apply {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             text = formattedDateTime
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-            setPadding(8, 8, 8, 8)  // Thêm padding cho TextView date-time
+            setPadding(4, 4, 4, 4)  // Thêm padding cho TextView date-time
         }
 
         val blockButton = Button(this).apply {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             text = "Chặn"
-            setPadding(8, 8, 8, 8)  // Thêm padding cho nút chặn
+            setPadding(4, 4, 4, 4)  // Thêm padding cho nút chặn
             setOnClickListener { showBlockDialog(email) }
         }
 

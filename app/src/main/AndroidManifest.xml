@@ -33,6 +33,7 @@
         <activity android:name=".MainActivity"
             android:exported="true">
         </activity>
+
         <activity android:name=".LoginActivity"
             android:exported="true"/>
         <activity android:name=".DifficultySelectionActivity"
@@ -60,6 +61,8 @@
         <activity android:name=".PlayerManagementAdmin"
             android:exported="true"/>
         <activity android:name=".HomeAdminActivity"
+            android:exported="true"/>
+        <activity android:name=".AdminRankingActivity"
             android:exported="true"/>
     </application>
 </manifest>

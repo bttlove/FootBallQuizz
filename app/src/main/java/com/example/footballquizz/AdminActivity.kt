@@ -59,26 +59,14 @@ class AdminActivity : AppCompatActivity() {
     val bottomNavigation: BottomNavigationView = findViewById(R.id.admin_bottom_navigation)
     bottomNavigation.setOnItemSelectedListener { item ->
       when (item.itemId) {
-        R.id.nav_home_admin -> {
-          Toast.makeText(this, "Go to Home Admin", Toast.LENGTH_SHORT).show()
-          true
-        }
         R.id.nav_player_management -> {
           val intent = Intent(this, PlayerManagementAdmin::class.java)
           startActivity(intent)
           true
         }
 
-        R.id.nav_player_management -> {
-          Toast.makeText(this, "Go to Player Management", Toast.LENGTH_SHORT).show()
-          true
-        }
-        R.id.nav_history -> {
-        Toast.makeText(this, "Go to Home Histoery", Toast.LENGTH_SHORT).show()
-        true
-      }
-        R.id.nav_settings -> {
-          Toast.makeText(this, "Go to Setting", Toast.LENGTH_SHORT).show()
+        R.id.nav_ranking -> {
+          startActivity(Intent(this, AdminRankingActivity::class.java))
           true
         }
 

@@ -1,25 +1,21 @@
 package com.example.footballquizz
+
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class RankingActivity : AppCompatActivity() {
+class AdminRankingActivity : AppCompatActivity() {
 
     private lateinit var firstPlaceName: TextView
     private lateinit var secondPlaceName: TextView
     private lateinit var thirdPlaceName: TextView
-    private lateinit var firstPlaceImage: ImageView
-    private lateinit var secondPlaceImage: ImageView
-    private lateinit var thirdPlaceImage: ImageView
     private lateinit var rankingListLayout: LinearLayout
     private lateinit var nextPageButton: Button
     private lateinit var previousPageButton: Button
@@ -32,34 +28,27 @@ class RankingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_ranking)
+        setContentView(R.layout.activity_ranking_admin)
 
         // Kết nối với các view trong layout
         firstPlaceName = findViewById(R.id.first_place_name)
         secondPlaceName = findViewById(R.id.second_place_name)
         thirdPlaceName = findViewById(R.id.third_place_name)
-        firstPlaceImage = findViewById(R.id.first_place_image)
-        secondPlaceImage = findViewById(R.id.second_place_image)
-        thirdPlaceImage = findViewById(R.id.third_place_image)
         rankingListLayout = findViewById(R.id.ranking_list)
         nextPageButton = findViewById(R.id.nextPageButton) // Thêm nút trang tiếp theo
         previousPageButton = findViewById(R.id.prevPageButton) // Thêm nút trang trước
         pageNumberTextView = findViewById(R.id.pageNumberTextView)
 
         // Thiết lập BottomNavigationView
-        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_admin)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, DifficultySelectionActivity::class.java))
+                R.id.nav_home_admin -> {
+                    startActivity(Intent(this, AdminActivity::class.java))
                     true
                 }
-                R.id.nav_settings -> {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    true
-                }
-                R.id.nav_history -> {
-                    startActivity(Intent(this, HistoryActivity::class.java))
+                R.id.nav_player_management -> {
+                    startActivity(Intent(this, PlayerManagementAdmin::class.java))
                     true
                 }
                 else -> false
@@ -98,7 +87,6 @@ class RankingActivity : AppCompatActivity() {
                 }
 
                 rankingListItems.sortByDescending { it.second }
-                updateTop3PlayersWithImages()
                 updateRankingUI()
                 pageNumberTextView.text = "Page $currentPage"
             }
@@ -108,67 +96,13 @@ class RankingActivity : AppCompatActivity() {
             }
     }
 
-
-    private fun updateTop3PlayersWithImages() {
-        for (i in 0 until minOf(3, rankingListItems.size)) {
-            val playerName = rankingListItems[i].first
-            fetchImageUrlForPlayer(playerName, i)
-        }
-    }
-
-    private fun fetchImageUrlForPlayer(playerName: String, index: Int) {
-        db.collection("score")
-            .whereEqualTo("name", playerName)
-            .get()
-            .addOnSuccessListener { scoreResult ->
-                if (scoreResult.documents.isNotEmpty()) {
-                    val email = scoreResult.documents[0].getString("e-mail")
-                    if (email != null) {
-                        db.collection("auths")
-                            .whereEqualTo("email", email)
-                            .get()
-                            .addOnSuccessListener { authResult ->
-                                if (!authResult.isEmpty) {
-                                    val imageUrl = authResult.documents[0].getString("image_url")
-                                    updateTopPlayerView(index, playerName, rankingListItems[index].second, imageUrl)
-                                }
-                            }
-                            .addOnFailureListener {
-                                // Xử lý lỗi nếu truy vấn thất bại
-                            }
-                    }
-                }
-            }
-    }
-
-    private fun updateTopPlayerView(index: Int, playerName: String, playerPoints: Double, imageUrl: String?) {
-        val textView = when (index) {
-            0 -> firstPlaceName
-            1 -> secondPlaceName
-            2 -> thirdPlaceName
-            else -> return
-        }
-        textView.text = "$playerName - $playerPoints points"
-
-        val imageView = when (index) {
-            0 -> firstPlaceImage
-            1 -> secondPlaceImage
-            2 -> thirdPlaceImage
-            else -> null
-        }
-
-        imageView?.let {
-            Glide.with(this).load(imageUrl).into(it)
-        }
-    }
-
     private fun updateRankingUI() {
         rankingListLayout.removeAllViews() // Xóa các hàng hiện tại trước khi cập nhật
 
         // Hiển thị top 3 người chơi
-        if (rankingListItems.isNotEmpty()) firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second}"
-        if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second} "
-        if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second} "
+        if (rankingListItems.isNotEmpty()) firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second} point"
+        if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second} point"
+        if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second} point"
 
         // Tính toán chỉ số bắt đầu và kết thúc cho trang hiện tại
         val startIndex = currentPage * itemsPerPage + 3 // Bắt đầu từ mục thứ 4

@@ -1,5 +1,4 @@
 package com.example.footballquizz
-
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -40,11 +39,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
         nextPageButton = findViewById(R.id.nextPageButton)
         prevPageButton = findViewById(R.id.prevPageButton)
         pageNumberTextView = findViewById(R.id.pageNumberTextView)
-
-
-
-
-
         val bottomNavigation: BottomNavigationView = findViewById(R.id.admin_bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -52,12 +46,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     startActivity(Intent(this, AdminActivity::class.java))
                     true
                 }
-                R.id.nav_history -> {
-                    startActivity(Intent(this, HistoryActivity::class.java))
-                    true
-                }
-                R.id.nav_settings -> {
-                    startActivity(Intent(this, MainActivity::class.java))
+                R.id.nav_ranking -> {
+                    startActivity(Intent(this, AdminRankingActivity::class.java))
                     true
                 }
                 else -> false

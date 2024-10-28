@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,155 +7,161 @@
     android:background="#F3F4F6"
     tools:context=".DifficultySelectionActivity">
 
-  <!-- Greeting and Profile Icon -->
-
-  <!-- Rank and Points Section -->
-  <TextView
-      android:id="@+id/greeting"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="32dp"
-      android:layout_marginTop="32dp"
-      android:text="Hello, Player"
-      android:textSize="30sp"
-      android:textStyle="bold"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-  <ImageView
-      android:id="@+id/profile_icon"
-      android:layout_width="50dp"
-      android:layout_height="50dp"
-      android:layout_marginTop="24dp"
-      android:layout_marginEnd="36dp"
-      android:contentDescription="Profile Icon"
-      android:scaleType="centerCrop"
-      android:src="@drawable/user_image"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
-
-  <LinearLayout
-      android:id="@+id/rank_section"
+  <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
-      android:layout_height="68dp"
-      android:layout_marginTop="40dp"
-      android:background="#ffffff"
-      android:elevation="4dp"
-      android:orientation="horizontal"
-      android:padding="10dp"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/greeting">
+      android:layout_height="wrap_content">
 
-    <!-- Rank -->
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/cup_image" />
+    <!-- Greeting and Profile Icon -->
 
+    <!-- Rank and Points Section -->
     <TextView
-        android:id="@+id/rank_textview"
+        android:id="@+id/greeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Rank: "
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:text="Hello, Player"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Divider -->
-    <View
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:background="#000000" />
-
-    <!-- Points -->
     <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="16dp"
-        android:contentDescription="Star Icon"
-        android:src="@drawable/point_image" />
+        android:id="@+id/profile_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="36dp"
+        android:contentDescription="Profile Icon"
+        android:scaleType="centerCrop"
+        android:src="@drawable/user_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/rank_section"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_marginTop="50dp"
+        android:background="#ffffff"
+        android:elevation="4dp"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/greeting">
+
+      <!-- Rank -->
+      <ImageView
+          android:layout_width="40dp"
+          android:layout_height="40dp"
+          android:src="@drawable/cup_image" />
+
+      <TextView
+          android:id="@+id/rank_textview"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="8dp"
+          android:text="Rank: "
+          android:textSize="20sp"
+          android:textStyle="bold" />
+
+      <!-- Divider -->
+      <View
+          android:layout_width="1dp"
+          android:layout_height="match_parent"
+          android:layout_marginStart="16dp"
+          android:background="#000000" />
+
+      <!-- Points -->
+      <ImageView
+          android:layout_width="40dp"
+          android:layout_height="40dp"
+          android:layout_marginStart="16dp"
+          android:contentDescription="Star Icon"
+          android:src="@drawable/point_image" />
+
+      <TextView
+          android:id="@+id/points_textview"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginStart="8dp"
+          android:text="Points: "
+          android:textSize="20sp"
+          android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- "Let's Play" Title -->
+
+    <!-- Game Mode Buttons in Vertical Layout -->
 
     <TextView
-        android:id="@+id/points_textview"
+        android:id="@+id/lets_play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Points: "
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-  </LinearLayout>
-
-  <!-- "Let's Play" Title -->
-
-  <!-- Game Mode Buttons in Vertical Layout -->
-
-  <TextView
-      android:id="@+id/lets_play"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="116dp"
-      android:layout_marginTop="28dp"
-      android:text="Chọn độ khó"
-      android:textSize="30sp"
-      android:textStyle="bold"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/rank_section" />
-
-  <LinearLayout
-      android:id="@+id/game_modes"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="44dp"
-      android:orientation="vertical"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@+id/lets_play">
-
-    <!-- Nút Dễ -->
-    <Button
-        android:id="@+id/btnEasy"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_margin="8dp"
-        android:text="Dễ"
+        android:layout_marginStart="116dp"
+        android:layout_marginTop="0dp"
+        android:text="Chọn độ khó"
         android:textSize="30sp"
-        android:backgroundTint="#4CAF50"
-        android:textColor="#FFFFFF" />
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rank_section" />
 
-    <!-- Nút Trung Bình -->
-    <Button
-        android:id="@+id/btnMedium"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_margin="8dp"
-        android:text="Trung Bình"
-        android:textSize="30sp"
-        android:backgroundTint="#FFC107"
-        android:textColor="#FFFFFF" />
+    <LinearLayout
+        android:id="@+id/game_modes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lets_play">
 
-    <!-- Nút Khó -->
-    <Button
-        android:id="@+id/btnHard"
-        android:layout_width="200dp"
-        android:layout_height="100dp"
-        android:layout_margin="8dp"
-        android:text="Khó"
-        android:textSize="30sp"
-        android:backgroundTint="#F44336"
-        android:textColor="#FFFFFF" />
-  </LinearLayout>
+      <!-- Nút Dễ -->
+      <Button
+          android:id="@+id/btnEasy"
+          android:layout_width="200dp"
+          android:layout_height="100dp"
+          android:layout_margin="8dp"
+          android:text="Dễ"
+          android:textSize="30sp"
+          android:backgroundTint="#4CAF50"
+          android:textColor="#FFFFFF" />
 
-  <!-- Bottom Navigation -->
-  <com.google.android.material.bottomnavigation.BottomNavigationView
-      android:id="@+id/bottom_navigation"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:menu="@menu/bottom_nav_menu" />
+      <!-- Nút Trung Bình -->
+      <Button
+          android:id="@+id/btnMedium"
+          android:layout_width="200dp"
+          android:layout_height="100dp"
+          android:layout_margin="8dp"
+          android:text="Trung Bình"
+          android:textSize="30sp"
+          android:backgroundTint="#FFC107"
+          android:textColor="#FFFFFF" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+      <!-- Nút Khó -->
+      <Button
+          android:id="@+id/btnHard"
+          android:layout_width="200dp"
+          android:layout_height="100dp"
+          android:layout_margin="8dp"
+          android:text="Khó"
+          android:textSize="30sp"
+          android:backgroundTint="#F44336"
+          android:textColor="#FFFFFF" />
+    </LinearLayout>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

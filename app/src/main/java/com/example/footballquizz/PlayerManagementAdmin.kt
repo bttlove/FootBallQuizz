@@ -60,6 +60,10 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     startActivity(Intent(this, MainActivity::class.java))
                     true
                 }
+                R.id.nav_ranking -> {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    true
+                }
                 else -> false
             }
         }

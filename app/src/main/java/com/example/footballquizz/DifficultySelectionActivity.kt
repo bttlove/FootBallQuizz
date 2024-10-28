@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -47,11 +48,16 @@ class DifficultySelectionActivity : AppCompatActivity() {
                         val imageUrl = document.getString("image_url")
                         if (imageUrl != null && imageUrl.isNotEmpty()) {
                             val profileImageView: ImageView = findViewById(R.id.profile_icon)
-                            // Sử dụng Glide để load ảnh
-                            Glide.with(this).load(imageUrl).into(profileImageView)
+                            val requestOptions = RequestOptions().circleCrop().override(300, 300)
+                            // Sử dụng Glide để load ảnh với requestOptions
+                            Glide.with(this)
+                                .load(imageUrl)
+                                .apply(requestOptions) // Sử dụng requestOptions
+                                .into(profileImageView)
                         }
                     }
                 }
+
 
                 // Lấy điểm cao nhất và tính rank
                 db.collection("score").get().addOnSuccessListener { result ->

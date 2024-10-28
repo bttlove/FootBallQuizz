@@ -36,7 +36,7 @@ class DifficultySelectionActivity : AppCompatActivity() {
 
                 // Hiển thị tên người dùng trong phần chào mừng
                 val greetingTextView: TextView = findViewById(R.id.greeting)
-                greetingTextView.text = "Hello, $username!"
+                greetingTextView.text = "Hello, $username"
 
                 // Lấy ảnh đại diện từ Firestore
                 val userId = currentUser.uid

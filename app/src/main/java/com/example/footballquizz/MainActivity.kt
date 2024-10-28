@@ -1,4 +1,7 @@
 package com.example.footballquizz
+
+
+
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -6,9 +9,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.annotation.NonNull
 import androidx.appcompat.app.AppCompatActivity
-
+import androidx.appcompat.widget.Toolbar
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.android.material.bottomnavigation.BottomNavigationView
 class MainActivity : AppCompatActivity() {
 
@@ -35,7 +42,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-
         // Get firebase auth instance
         auth = FirebaseAuth.getInstance()
 
@@ -54,8 +60,9 @@ class MainActivity : AppCompatActivity() {
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_history -> {
 
+                R.id.nav_history -> {
+                    // Chuyển đến trang DifficultySelectionActivity
                     startActivity(Intent(this, HistoryActivity::class.java))
                     true
                 }
@@ -65,6 +72,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.nav_ranking -> {
                     startActivity(Intent(this, RankingActivity::class.java))
+                    true
+                }
+                R.id.nav_home_admin -> {
+                    startActivity(Intent(this, AdminActivity::class.java))
+                    true
+                }
+                R.id.nav_player_management -> {
+                    startActivity(Intent(this, PlayerManagementAdmin::class.java))
                     true
                 }
                 else -> false

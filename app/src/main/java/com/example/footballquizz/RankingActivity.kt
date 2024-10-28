@@ -1,5 +1,4 @@
 package com.example.footballquizz
-
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -53,10 +52,6 @@ class RankingActivity : AppCompatActivity() {
                 }
                 R.id.nav_history -> {
                     startActivity(Intent(this, HistoryActivity::class.java))
-                    true
-                }
-                R.id.nav_home_admin -> {
-                    startActivity(Intent(this, AdminActivity::class.java))
                     true
                 }
                 else -> false

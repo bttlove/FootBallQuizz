@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TableLayout
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
@@ -50,25 +49,17 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     startActivity(Intent(this, AdminRankingActivity::class.java))
                     true
                 }
-                R.id.nav_ranking -> {
-                    startActivity(Intent(this, MainActivity::class.java))
-                    true
-                }
                 else -> false
             }
         }
-
         nextPageButton.setOnClickListener { loadNextPage() }
         prevPageButton.setOnClickListener { loadPreviousPage() }
-
         loadPlayerData()
     }
-
     private fun loadPlayerData() {
         val query = db.collection("auths")
             .orderBy("date-time", com.google.firebase.firestore.Query.Direction.DESCENDING)
             .limit(pageSize.toLong())
-
         if (lastVisible != null) {
             query.startAfter(lastVisible)  // Chuyển sang trang tiếp theo
         }
@@ -89,8 +80,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     val dateTime = document.getString("date-time") ?: "Unknown"
                     val imageUrl = document.getString("image_url") ?: ""
                     val formattedDateTime = formatDateTime(dateTime)
-
                     val playerRow = TableRow(this)
+
                     val playerImageView = ImageView(this).apply {
                         layoutParams = TableRow.LayoutParams(0, 150, 1f)
                         scaleType = ImageView.ScaleType.CENTER_CROP
@@ -100,12 +91,23 @@ class PlayerManagementAdmin : AppCompatActivity() {
                             val requestOptions = RequestOptions().circleCrop().override(150, 150)
                             Glide.with(this@PlayerManagementAdmin).load(imageUrl).apply(requestOptions).into(this)
                         }
+                        // Set a click listener to start ProfileActivity
+                        setOnClickListener {
+                            val intent = Intent(this@PlayerManagementAdmin, ProfileActivity::class.java)
+                            intent.putExtra("USER_EMAIL", email) // Pass the email to ProfileActivity
+                            startActivity(intent)
+                        }
                     }
 
                     val emailTextView = TextView(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
                         text = email
                         textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                        setOnClickListener {
+                            val intent = Intent(this@PlayerManagementAdmin, ProfileActivity::class.java)
+                            intent.putExtra("USER_EMAIL", email) // Pass the email to ProfileActivity
+                            startActivity(intent)
+                        }
                     }
                     val dateTimeTextView = TextView(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
@@ -123,12 +125,10 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     playerRow.addView(dateTimeTextView)
                     playerRow.addView(blockButton)
                     playerListLayout.addView(playerRow)
-
                     if (index == result.size() - 1) {
                         lastVisible = document  // Ghi lại tài liệu cuối cùng của trang này
                     }
                 }
-
                 // Cập nhật trạng thái của các nút phân trang
                 prevPageButton.isEnabled = currentPage > 1
                 nextPageButton.isEnabled = result.size() == pageSize
@@ -137,7 +137,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
                 Toast.makeText(this, "Không thể tải dữ liệu người chơi: $e", Toast.LENGTH_SHORT).show()
             }
     }
-
     private fun loadNextPage() {
         lastVisible?.let {
             db.collection("auths")
@@ -190,7 +189,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     for (document in result.documents) {
                         addPlayerRow(document)
                     }
-
                     // Cập nhật chỉ mục cho trang hiện tại
                     firstVisible = result.documents.firstOrNull()
                     lastVisible = result.documents.lastOrNull()
@@ -227,11 +225,17 @@ class PlayerManagementAdmin : AppCompatActivity() {
             layoutParams = TableRow.LayoutParams(0, 150, 1f)
             scaleType = ImageView.ScaleType.CENTER_CROP
             adjustViewBounds = true
-            setPadding(8, 8, 8, 8)  // Thêm padding cho ảnh
 
             if (imageUrl.isNotEmpty()) {
                 val requestOptions = RequestOptions().circleCrop().override(150, 150)
                 Glide.with(this@PlayerManagementAdmin).load(imageUrl).apply(requestOptions).into(this)
+            }
+
+            // Set a click listener to start ProfileActivity
+            setOnClickListener {
+                val intent = Intent(this@PlayerManagementAdmin, ProfileActivity::class.java)
+                intent.putExtra("USER_EMAIL", email) // Pass the email to ProfileActivity
+                startActivity(intent)
             }
         }
 
@@ -240,19 +244,32 @@ class PlayerManagementAdmin : AppCompatActivity() {
             text = email
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
             setPadding(8, 8, 8, 8)  // Thêm padding cho TextView email
+
+            setOnClickListener {
+                val intent = Intent(this@PlayerManagementAdmin, ProfileActivity::class.java)
+                intent.putExtra("USER_EMAIL", email) // Pass the email to ProfileActivity
+                startActivity(intent)
+
+
+            }
+
+
+
+            setPadding(4, 4, 4, 4)  // Thêm padding cho TextView email
+
         }
 
         val dateTimeTextView = TextView(this).apply {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             text = formattedDateTime
             textAlignment = TextView.TEXT_ALIGNMENT_CENTER
-            setPadding(8, 8, 8, 8)  // Thêm padding cho TextView date-time
+            setPadding(4, 4, 4, 4)  // Thêm padding cho TextView date-time
         }
 
         val blockButton = Button(this).apply {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             text = "Chặn"
-            setPadding(8, 8, 8, 8)  // Thêm padding cho nút chặn
+            setPadding(4, 4, 4, 4)  // Thêm padding cho nút chặn
             setOnClickListener { showBlockDialog(email) }
         }
 

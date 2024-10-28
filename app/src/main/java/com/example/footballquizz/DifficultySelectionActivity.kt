@@ -7,7 +7,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -36,7 +35,7 @@ class DifficultySelectionActivity : AppCompatActivity() {
 
                 // Hiển thị tên người dùng trong phần chào mừng
                 val greetingTextView: TextView = findViewById(R.id.greeting)
-                greetingTextView.text = "Hello, $username"
+                greetingTextView.text = "Hello, $username!"
 
                 // Lấy ảnh đại diện từ Firestore
                 val userId = currentUser.uid
@@ -48,16 +47,11 @@ class DifficultySelectionActivity : AppCompatActivity() {
                         val imageUrl = document.getString("image_url")
                         if (imageUrl != null && imageUrl.isNotEmpty()) {
                             val profileImageView: ImageView = findViewById(R.id.profile_icon)
-                            val requestOptions = RequestOptions().circleCrop().override(300, 300)
-                            // Sử dụng Glide để load ảnh với requestOptions
-                            Glide.with(this)
-                                .load(imageUrl)
-                                .apply(requestOptions) // Sử dụng requestOptions
-                                .into(profileImageView)
+                            // Sử dụng Glide để load ảnh
+                            Glide.with(this).load(imageUrl).into(profileImageView)
                         }
                     }
                 }
-
 
                 // Lấy điểm cao nhất và tính rank
                 db.collection("score").get().addOnSuccessListener { result ->

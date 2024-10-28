@@ -48,9 +48,15 @@ class HistoryActivity : AppCompatActivity() {
                 else -> false
             }
         }
+        // Lấy email từ Intent
+        val userEmail = intent.getStringExtra("email")
+        if (userEmail == null) {
+            Toast.makeText(this, "User email not provided!", Toast.LENGTH_SHORT).show()
+            return
+        }
         // Get the current logged-in user's email
         val currentUser = auth.currentUser
-        val userEmail = currentUser?.email
+//        val userEmail = currentUser?.email
 
         if (userEmail == null) {
             Toast.makeText(this, "User is not logged in!", Toast.LENGTH_SHORT).show()

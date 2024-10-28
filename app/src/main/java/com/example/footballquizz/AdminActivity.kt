@@ -270,6 +270,7 @@ class AdminActivity : AppCompatActivity() {
   private fun updatePlayerInFirebase(id: String, name: String, club: String, year: String, imageUrl: String) {
     val database = FirebaseDatabase.getInstance().getReference("players").child(id)
 
+
     val updatedPlayer = QuizzModel(
       name = name,
       yearOfBirth = year.toInt(),

@@ -9,7 +9,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-
 import android.os.CountDownTimer
 
 class QuizActivity : AppCompatActivity() {
@@ -21,6 +20,7 @@ class QuizActivity : AppCompatActivity() {
   private lateinit var btnAnswer4: Button
   private lateinit var ivPlayerImage: ImageView
   private lateinit var tvTimer: TextView
+
   private var easyQuestionsAsked = 0
   private var easyCorrectAnswers = 0
   private var mediumCorrectAnswers = 0
@@ -34,9 +34,17 @@ class QuizActivity : AppCompatActivity() {
   private lateinit var players: List<QuizzModel>
   private lateinit var correctAnswer: String
   private var difficulty: String? = null
+  private var questionIndex = 0
+  private var difficultyMix: List<String> = listOf()
 
   private var quizStartTime: Long = 0L
   private var remainingTimeInMillis: Long = 0L
+
+  // Track actual difficulty of current question
+  private var currentQuestionDifficulty: String = "easy"
+
+  // Total score tracking
+  private var totalScore: Int = 0 // New variable to hold the accumulated score
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -52,9 +60,11 @@ class QuizActivity : AppCompatActivity() {
     tvTimer = findViewById(R.id.tvTimer)
 
     difficulty = intent.getStringExtra("DIFFICULTY")
-
-    // Start time of the quiz
-    quizStartTime = System.currentTimeMillis()
+    difficultyMix = if (difficulty == "random") {
+      generateRandomDifficultyMix() // Create mix for "random"
+    } else {
+      List(10) { difficulty ?: "easy" }
+    }
 
     // Get player data from Firebase
     val firebaseRepo = FirebaseRepository()
@@ -66,15 +76,25 @@ class QuizActivity : AppCompatActivity() {
     setupAnswerButtons()
   }
 
+  private fun generateRandomDifficultyMix(): List<String> {
+    val difficulties = mutableListOf<String>()
+    val easyCount = (2..4).random()
+    val hardCount = (2..4).random()
+    val mediumCount = 10 - easyCount - hardCount
+
+    repeat(easyCount) { difficulties.add("easy") }
+    repeat(mediumCount) { difficulties.add("medium") }
+    repeat(hardCount) { difficulties.add("hard") }
+
+    return difficulties.shuffled()
+  }
+
   // Setup quiz question
   private fun setupQuiz() {
-    if (players.isEmpty()) {
-      tvQuestion.text = "Không có dữ liệu cầu thủ!"
+    if (questionIndex >= difficultyMix.size) {
+      navigateToScoreActivity()
       return
     }
-
-    // Reset timer if any
-    timer?.cancel()
 
     // Check the number of questions asked per difficulty
     when (difficulty) {
@@ -101,6 +121,10 @@ class QuizActivity : AppCompatActivity() {
       }
     }
 
+    val currentDifficulty = difficultyMix[questionIndex]
+    currentQuestionDifficulty = currentDifficulty // Track actual question difficulty
+    questionIndex++
+
     // Randomly select a player
     val player = players.random()
 
@@ -108,7 +132,7 @@ class QuizActivity : AppCompatActivity() {
     Glide.with(this).load(player.imageUrl).into(ivPlayerImage)
 
     // Create question and answers based on difficulty
-    when (difficulty) {
+    when (currentDifficulty) {
       "easy" -> {
         tvQuestion.text = "Cầu thủ ${player.name} này thuộc câu lạc bộ nào?"
         correctAnswer = player.club
@@ -126,7 +150,7 @@ class QuizActivity : AppCompatActivity() {
       }
     }
 
-    // Start countdown timer
+    // Start countdown timer for the question
     startCountdownTimer()
   }
 
@@ -135,12 +159,12 @@ class QuizActivity : AppCompatActivity() {
     val answers = mutableListOf(correct)
     val wrongAnswers = players.filter {
       it.name != correct &&
-              it.club != wrong1 &&
-              it.yearOfBirth.toString() != wrong2
+        it.club != wrong1 &&
+        it.yearOfBirth.toString() != wrong2
     }.shuffled().take(3)
 
     answers.addAll(wrongAnswers.map {
-      when (difficulty) {
+      when (difficultyMix[questionIndex - 1]) {
         "easy" -> it.club
         "medium" -> it.name
         "hard" -> it.yearOfBirth.toString()
@@ -166,27 +190,30 @@ class QuizActivity : AppCompatActivity() {
       if (selectedAnswer == correctAnswer) {
         tvQuestion.text = "Đúng rồi!"
         correctAnswers++
+        totalScore += calculateScore() // Add points for correct answer
 
-        when (difficulty) {
+        when (currentQuestionDifficulty) {
           "easy" -> easyCorrectAnswers++
           "medium" -> mediumCorrectAnswers++
           "hard" -> hardCorrectAnswers++
         }
+        Log.d("QuizActivity", "Correct Answer! Total Correct: $correctAnswers, Score: ${calculateScore()}")
       } else {
         tvQuestion.text = "Sai rồi, đáp án đúng là: $correctAnswer"
         incorrectAnswers++
+        Log.d("QuizActivity", "Incorrect Answer! Correct Answer was: $correctAnswer")
       }
 
       // Display score
       displayScore()
 
-      // Load next question after 1 second
+      // Automatically proceed to next question after 1 second
       view.postDelayed({
         setupQuiz()
       }, 1000)
     }
 
-    // Assign click listeners
+    // Assign click listener to answer buttons
     btnAnswer1.setOnClickListener(clickListener)
     btnAnswer2.setOnClickListener(clickListener)
     btnAnswer3.setOnClickListener(clickListener)
@@ -195,55 +222,56 @@ class QuizActivity : AppCompatActivity() {
 
   // Display score
   private fun displayScore() {
-    val score = calculateScore()
-    tvQuestion.append("\nCâu đúng: $correctAnswers\nCâu sai: $incorrectAnswers\nĐiểm: $score")
+    Log.d("QuizActivity", "Total Score: $totalScore") // Log total score
+    tvQuestion.append("\nCâu đúng: $correctAnswers\nCâu sai: $incorrectAnswers\nĐiểm hiện tại: $totalScore")
   }
 
   // Calculate score based on difficulty
   private fun calculateScore(): Int {
-    var score = 0
-    score += easyCorrectAnswers * 1
-    score += mediumCorrectAnswers * 5
-    score += hardCorrectAnswers * 10
-    return score
+    return when (currentQuestionDifficulty) {
+      "easy" -> 10
+      "medium" -> 50
+      "hard" -> 100
+      else -> 0
+    }
   }
 
-  // Start countdown timer
+  // Start countdown timer for the question
   private fun startCountdownTimer() {
-    timer = object : CountDownTimer(30000, 1000) { // 30 seconds per question
+    remainingTimeInMillis = 20000 // 20 seconds
+    tvTimer.text = formatTime(remainingTimeInMillis)
+
+    timer = object : CountDownTimer(remainingTimeInMillis, 1000) {
       override fun onTick(millisUntilFinished: Long) {
         remainingTimeInMillis = millisUntilFinished
-        val secondsRemaining = millisUntilFinished / 1000
-        tvTimer.text = "Thời gian còn lại: $secondsRemaining giây"
+        tvTimer.text = formatTime(remainingTimeInMillis)
       }
 
       override fun onFinish() {
-        remainingTimeInMillis = 0
         tvQuestion.text = "Hết thời gian! Đáp án đúng là: $correctAnswer"
-        incorrectAnswers++
-
-        // Display score
+        incorrectAnswers++ // Mark question as incorrect
         displayScore()
 
-        // Load next question after 1 second
-        tvQuestion.postDelayed({
-          setupQuiz()
-        }, 1000)
+        // Automatically proceed to the next question
+        setupQuiz()
       }
     }.start()
   }
 
-  // Navigate to ScoreActivity
-  private fun navigateToScoreActivity() {
-    timer?.cancel()
+  // Format time for display
+  private fun formatTime(millis: Long): String {
+    val seconds = (millis / 1000).toInt()
+    return String.format("%02d:%02d", seconds / 60, seconds % 60)
+  }
 
+  // Navigate to the score activity
+  private fun navigateToScoreActivity() {
     val quizEndTime = System.currentTimeMillis()
     val totalTimeTaken = quizEndTime - quizStartTime
-
     val intent = Intent(this, ScoreActivity::class.java)
-    intent.putExtra("SCORE", calculateScore())
-    intent.putExtra("DIFFICULTY", difficulty)
-    intent.putExtra("TIME_TAKEN", totalTimeTaken)
+    intent.putExtra("SCORE", totalScore) // Send total score
+    intent.putExtra("DIFFICULTY", difficulty) // Send chosen difficulty
+    intent.putExtra("TIME_TAKEN", totalTimeTaken) // Send total time taken
     startActivity(intent)
     finish()
   }

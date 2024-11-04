@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.firestore.FirebaseFirestore
 
-class ProfileActivity : AppCompatActivity() {
+class Profile_UserActivity : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
     private lateinit var listViewHistory: ListView
@@ -17,12 +17,12 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.profile)
+        setContentView(R.layout.profile_user)
 
         listViewHistory =
             findViewById(R.id.listViewHistory) // Ensure you have this ListView in activity_profile.xml
 
-        // Get the email passed from the PlayerManagementAdmin activity
+
         val userEmail = intent.getStringExtra("USER_EMAIL")
 
         if (userEmail != null) {
@@ -59,7 +59,7 @@ class ProfileActivity : AppCompatActivity() {
             Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show()
         }
         // Set up bottom navigation
-        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_admin)
+        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_user)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home_admin -> {

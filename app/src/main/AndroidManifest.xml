@@ -38,7 +38,9 @@
             android:exported="true"/>
         <activity android:name=".DifficultySelectionActivity"
             android:exported="true"/>
-        <activity android:name=".ProfileActivity"
+        <activity android:name=".Profile_AdminActivity"
+            android:exported="true"/>
+        <activity android:name=".Profile_UserActivity"
             android:exported="true"/>
         <activity android:name=".QuizActivity"
             android:exported="true"/>

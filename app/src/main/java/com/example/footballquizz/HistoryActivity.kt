@@ -41,27 +41,21 @@ class HistoryActivity : AppCompatActivity() {
                     startActivity(Intent(this, RankingActivity::class.java))
                     true
                 }
-                R.id.nav_home_admin -> {
-                    startActivity(Intent(this, AdminActivity::class.java))
+                R.id.nav_history -> {
+                    startActivity(Intent(this, HistoryActivity::class.java))
                     true
                 }
                 else -> false
             }
         }
         // Lấy email từ Intent
-        val userEmail = intent.getStringExtra("email")
+        val userEmail = intent.getStringExtra("USER_EMAIL")  ?: auth.currentUser?.email
         if (userEmail == null) {
             Toast.makeText(this, "User email not provided!", Toast.LENGTH_SHORT).show()
             return
         }
-        // Get the current logged-in user's email
-        val currentUser = auth.currentUser
-//        val userEmail = currentUser?.email
 
-        if (userEmail == null) {
-            Toast.makeText(this, "User is not logged in!", Toast.LENGTH_SHORT).show()
-            return
-        }
+
 
         // Fetch scores from Firestore
         db.collection("score")

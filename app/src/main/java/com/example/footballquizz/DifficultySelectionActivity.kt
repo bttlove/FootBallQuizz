@@ -33,6 +33,7 @@ class DifficultySelectionActivity : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
         db.collection("auths").document(userId).get().addOnSuccessListener { document ->
           val imageUrl = document.getString("image_url")
+
           if (imageUrl != null && imageUrl.isNotEmpty()) {
             val profileImageView: ImageView = findViewById(R.id.profile_icon)
             Glide.with(this).load(imageUrl).into(profileImageView)

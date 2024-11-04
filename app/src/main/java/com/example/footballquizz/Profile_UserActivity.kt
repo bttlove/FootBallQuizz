@@ -73,7 +73,7 @@ class Profile_UserActivity : AppCompatActivity() {
                 }
 
                 R.id.nav_ranking -> {
-                    startActivity(Intent(this, AdminRankingActivity::class.java))
+                    startActivity(Intent(this, RankingActivity::class.java))
                     true
                 }
 

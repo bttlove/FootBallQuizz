@@ -62,21 +62,10 @@ class Profile_UserActivity : AppCompatActivity() {
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_user)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home_admin -> {
-                    startActivity(Intent(this, AdminActivity::class.java))
-                    true
-                }
-
-                R.id.nav_player_management -> {
-                    startActivity(Intent(this, PlayerManagementAdmin::class.java))
-                    true
-                }
-
                 R.id.nav_ranking -> {
-                    startActivity(Intent(this, AdminRankingActivity::class.java))
+                    startActivity(Intent(this, RankingActivity::class.java))
                     true
                 }
-
                 else -> false
             }
         }

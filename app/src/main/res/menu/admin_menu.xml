@@ -10,8 +10,11 @@
         android:title="Người chơi" />
 
     <item
-        android:id="@+id/nav_ranking"
+        android:id="@+id/nav_ranking_admin"
         android:icon="@drawable/top"
         android:title="Xếp hạng" />
+
+
+
 </menu>
 

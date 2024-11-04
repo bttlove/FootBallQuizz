@@ -113,8 +113,7 @@ class DifficultySelectionActivity : AppCompatActivity() {
   }
 
   private fun startPracticeActivity() {
-    val intent = Intent(this, QuizActivity::class.java)
-    intent.putExtra("DIFFICULTY", "practice")
+    val intent = Intent(this, QuizPracticeActivity::class.java)
     startActivity(intent)
   }
 }

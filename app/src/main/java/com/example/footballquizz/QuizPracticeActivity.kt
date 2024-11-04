@@ -2,16 +2,13 @@ package com.example.footballquizz
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
-import android.os.CountDownTimer
 
-open class QuizActivity : AppCompatActivity() {
+class QuizPracticeActivity : AppCompatActivity() {
 
   private lateinit var tvQuestion: TextView
   private lateinit var btnAnswer1: Button
@@ -19,34 +16,16 @@ open class QuizActivity : AppCompatActivity() {
   private lateinit var btnAnswer3: Button
   private lateinit var btnAnswer4: Button
   private lateinit var ivPlayerImage: ImageView
-  private lateinit var tvTimer: TextView
-
-  private var easyQuestionsAsked = 0
-  private var easyCorrectAnswers = 0
-  private var mediumCorrectAnswers = 0
-  private var hardCorrectAnswers = 0
-  private var mediumQuestionsAsked = 0
-  private var hardQuestionsAsked = 0
-  private var correctAnswers = 0
-  private var incorrectAnswers = 0
-  private var timer: CountDownTimer? = null
+  private lateinit var btnBack: Button
 
   private lateinit var players: List<QuizzModel>
   private lateinit var correctAnswer: String
-  private var difficulty: String? = null
   private var questionIndex = 0
   private var difficultyMix: List<String> = listOf()
 
-  private var quizStartTime: Long = 0L
-  private var remainingTimeInMillis: Long = 0L
-  private var currentQuestionDifficulty: String = "easy"
-  private var score: Int = 0
-  private var isPracticeMode = false
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    setContentView(R.layout.activity_quiz)
-    quizStartTime = System.currentTimeMillis()
+    setContentView(R.layout.activity_quiz_practice)
 
     tvQuestion = findViewById(R.id.tvQuestion)
     btnAnswer1 = findViewById(R.id.btnAnswer1)
@@ -54,16 +33,9 @@ open class QuizActivity : AppCompatActivity() {
     btnAnswer3 = findViewById(R.id.btnAnswer3)
     btnAnswer4 = findViewById(R.id.btnAnswer4)
     ivPlayerImage = findViewById(R.id.ivPlayerImage)
-    tvTimer = findViewById(R.id.tvTimer)
+    btnBack = findViewById(R.id.btnBack)
 
-    difficulty = intent.getStringExtra("DIFFICULTY")
-    isPracticeMode = difficulty == "practice"
-
-    difficultyMix = if (difficulty == "random") {
-      generateRandomDifficultyMix()
-    } else {
-      List(10) { difficulty ?: "easy" }
-    }
+    difficultyMix = generateRandomDifficultyMix()
 
     val firebaseRepo = FirebaseRepository()
     firebaseRepo.getPlayersData { playerList ->
@@ -72,6 +44,12 @@ open class QuizActivity : AppCompatActivity() {
     }
 
     setupAnswerButtons()
+
+    btnBack.setOnClickListener {
+      val intent = Intent(this, DifficultySelectionActivity::class.java)
+      startActivity(intent)
+      finish()
+    }
   }
 
   private fun generateRandomDifficultyMix(): List<String> {
@@ -89,22 +67,10 @@ open class QuizActivity : AppCompatActivity() {
 
   private fun setupQuiz() {
     if (questionIndex >= difficultyMix.size) {
-      if (!isPracticeMode) {
-        navigateToScoreActivity()
-      } else {
-        questionIndex = 0
-      }
-      return
-    }
-
-    when (difficulty) {
-      "easy" -> if (++easyQuestionsAsked > 10) navigateToScoreActivity()
-      "medium" -> if (++mediumQuestionsAsked > 10) navigateToScoreActivity()
-      "hard" -> if (++hardQuestionsAsked > 10) navigateToScoreActivity()
+      questionIndex = 0
     }
 
     val currentDifficulty = difficultyMix[questionIndex]
-    currentQuestionDifficulty = currentDifficulty
     questionIndex++
 
     val player = players.random()
@@ -126,12 +92,6 @@ open class QuizActivity : AppCompatActivity() {
         correctAnswer = player.yearOfBirth.toString()
         setupAnswerOptions(player.yearOfBirth.toString(), player.club, player.name)
       }
-    }
-
-    if (!isPracticeMode) {
-      startCountdownTimer()
-    } else {
-      tvTimer.visibility = View.GONE
     }
   }
 
@@ -160,27 +120,20 @@ open class QuizActivity : AppCompatActivity() {
   }
 
   private fun setupAnswerButtons() {
-    val clickListener = View.OnClickListener { view ->
-      if (!isPracticeMode) timer?.cancel()
-
-      val selectedAnswer = (view as Button).text.toString()
+    val clickListener = { view: Button ->
+      val selectedAnswer = view.text.toString()
       if (selectedAnswer == correctAnswer) {
-        tvQuestion.text = "Đúng rồi!"
+
         if (btnAnswer1.text == correctAnswer) btnAnswer1.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
         if (btnAnswer2.text == correctAnswer) btnAnswer2.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
         if (btnAnswer3.text == correctAnswer) btnAnswer3.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
         if (btnAnswer4.text == correctAnswer) btnAnswer4.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
-
-        if (!isPracticeMode) {
-          correctAnswers++
-          score += calculateScore()
-          displayScore()
-        }
+        tvQuestion.text = "Đúng rồi!"
       } else {
         tvQuestion.text = "Sai rồi, đáp án đúng là: $correctAnswer"
         view.setBackgroundColor(resources.getColor(android.R.color.holo_red_light))
 
-        if (!isPracticeMode) incorrectAnswers++
+        // Tô màu xanh cho nút có câu trả lời đúng
         if (btnAnswer1.text == correctAnswer) btnAnswer1.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
         if (btnAnswer2.text == correctAnswer) btnAnswer2.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
         if (btnAnswer3.text == correctAnswer) btnAnswer3.setBackgroundColor(resources.getColor(android.R.color.holo_green_light))
@@ -188,72 +141,21 @@ open class QuizActivity : AppCompatActivity() {
       }
 
       view.postDelayed({
-        resetAnswerButtonColors()
         setupQuiz()
+        resetAnswerButtonColors()
       }, 2000)
     }
 
-    btnAnswer1.setOnClickListener(clickListener)
-    btnAnswer2.setOnClickListener(clickListener)
-    btnAnswer3.setOnClickListener(clickListener)
-    btnAnswer4.setOnClickListener(clickListener)
+    btnAnswer1.setOnClickListener { clickListener(btnAnswer1) }
+    btnAnswer2.setOnClickListener { clickListener(btnAnswer2) }
+    btnAnswer3.setOnClickListener { clickListener(btnAnswer3) }
+    btnAnswer4.setOnClickListener { clickListener(btnAnswer4) }
   }
   private fun resetAnswerButtonColors() {
     btnAnswer1.setBackgroundColor(resources.getColor(R.color.bg_main))
     btnAnswer2.setBackgroundColor(resources.getColor(R.color.bg_main))
     btnAnswer3.setBackgroundColor(resources.getColor(R.color.bg_main))
     btnAnswer4.setBackgroundColor(resources.getColor(R.color.bg_main))
-  }
-
-  private fun displayScore() {
-    if (!isPracticeMode) {
-      Log.d("QuizActivity", "Total Score: $score")
-      tvQuestion.append("\nCâu đúng: $correctAnswers\nCâu sai: $incorrectAnswers\nĐiểm hiện tại: $score")
-    }
-  }
-
-  private fun calculateScore(): Int {
-    return when (currentQuestionDifficulty) {
-      "easy" -> 10
-      "medium" -> 50
-      "hard" -> 100
-      else -> 0
-    }
-  }
-
-  private fun startCountdownTimer() {
-    remainingTimeInMillis = 20000
-    tvTimer.text = formatTime(remainingTimeInMillis)
-
-    timer = object : CountDownTimer(remainingTimeInMillis, 1000) {
-      override fun onTick(millisUntilFinished: Long) {
-        remainingTimeInMillis = millisUntilFinished
-        tvTimer.text = formatTime(remainingTimeInMillis)
-      }
-
-      override fun onFinish() {
-        tvQuestion.text = "Hết thời gian! Đáp án đúng là: $correctAnswer"
-        incorrectAnswers++
-        displayScore()
-        setupQuiz()
-      }
-    }.start()
-  }
-
-  private fun formatTime(millis: Long): String {
-    val seconds = (millis / 1000).toInt()
-    return String.format("%02d:%02d", seconds / 60, seconds % 60)
-  }
-
-  private fun navigateToScoreActivity() {
-    val quizEndTime = System.currentTimeMillis()
-    val timeTakenInMillis = quizEndTime - quizStartTime
-    val intent = Intent(this, ScoreActivity::class.java)
-    intent.putExtra("SCORE", score)
-    intent.putExtra("DIFFICULTY", difficulty)
-    intent.putExtra("TIME_TAKEN", timeTakenInMillis)
-    startActivity(intent)
-    finish()
   }
 
 }

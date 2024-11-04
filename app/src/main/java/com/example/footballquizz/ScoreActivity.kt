@@ -37,9 +37,13 @@ class ScoreActivity : AppCompatActivity() {
     val score = intent.getIntExtra("SCORE", 0)
     val difficulty = intent.getStringExtra("DIFFICULTY")
     val timeTakenInMillis = intent.getLongExtra("TIME_TAKEN", 0L)
-    val timeTakenInSeconds = timeTakenInMillis / 1000
 
-    tvScore.text = "Tổng điểm của bạn: $score"
+    val minutes = (timeTakenInMillis / 1000) / 60
+    val seconds = (timeTakenInMillis / 1000) % 60
+    val timeFormatted = String.format("%02d:%02d", minutes, seconds)
+
+    tvScore.text = "Tổng điểm của bạn: $score\nThời gian hoàn thành: $timeFormatted"
+    //tvScore.text = "Tổng điểm của bạn: $score\nThời gian hoàn thành: $timeTakenInMillis"
 
     // Get the current logged-in user's email
     val currentUser = auth.currentUser
@@ -59,6 +63,12 @@ class ScoreActivity : AppCompatActivity() {
         return@setOnClickListener
       }
 
+      // Check that difficulty is not null
+      if (difficulty == null) {
+        Toast.makeText(this, "Difficulty level is missing!", Toast.LENGTH_SHORT).show()
+        return@setOnClickListener
+      }
+
       // Get the current time
       val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
       val currentTime = sdf.format(Date())
@@ -69,7 +79,7 @@ class ScoreActivity : AppCompatActivity() {
         "name" to playerName,
         "point" to score.toString(),
         "difficulty" to difficulty,
-        "timeTaken" to timeTakenInSeconds.toString(),
+        "timeTaken" to timeFormatted,
         "time" to currentTime
       )
 

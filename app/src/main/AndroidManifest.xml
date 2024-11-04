@@ -44,6 +44,8 @@
             android:exported="true"/>
         <activity android:name=".QuizActivity"
             android:exported="true"/>
+      <activity android:name=".QuizPracticeActivity"
+        android:exported="true"/>
         <activity android:name=".ScoreActivity"
             android:exported="true"/>
         <!-- Khai báo SignupActivity -->

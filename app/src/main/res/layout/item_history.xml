@@ -1,57 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:padding="8dp"
+  android:orientation="horizontal">
+
+  <!-- Player Name -->
+  <TextView
+    android:id="@+id/tvPlayerName"
+    android:layout_width="0dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:layout_weight="1"
+    android:text="Tên người chơi"
+    android:textColor="#000000" /> <!-- Black text color -->
 
-    <TextView
-        android:id="@+id/tvName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+  <!-- Score -->
+  <TextView
+    android:id="@+id/tvScore"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:text="Điểm số"
+    android:textColor="#000000" /> <!-- Black text color -->
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+  <!-- Difficulty -->
+  <TextView
+    android:id="@+id/tvDifficulty"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:text="Độ khó"
+    android:textColor="#000000" /> <!-- Black text color -->
 
-    <TextView
-        android:id="@+id/tvScore"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+  <!-- Time Taken -->
+  <TextView
+    android:id="@+id/tvTimeTaken"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:text="Thời gian thực hiện"
+    android:textColor="#000000" /> <!-- Black text color -->
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
+  <!-- Total Time -->
+  <TextView
+    android:id="@+id/tvTotalTime"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:text="Thời gian hoàn thành"
+    android:textColor="#000000" /> <!-- Black text color -->
 
-    <TextView
-        android:id="@+id/tvDifficulty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
-
-    <TextView
-        android:id="@+id/tvTimeTaken"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@android:color/darker_gray"/>
-
-    <TextView
-        android:id="@+id/tvTime"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="25dp"
-        android:background="@color/input_register_bg"/>
 </LinearLayout>

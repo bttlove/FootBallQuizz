@@ -49,9 +49,9 @@ class Profile_AdminActivity : AppCompatActivity() {
                     }
 
                     // Set up adapter
-                    historyAdapter = HistoryAdapter(this, historyList)
-                    listViewHistory.adapter = historyAdapter
-                }
+                  historyAdapter = HistoryAdapter(this, historyList)
+                  listViewHistory.adapter = historyAdapter
+                  }
                 .addOnFailureListener { e ->
                     Toast.makeText(this, "Failed to fetch history: $e", Toast.LENGTH_SHORT).show()
                 }
@@ -72,10 +72,10 @@ class Profile_AdminActivity : AppCompatActivity() {
                     true
                 }
 
-                R.id.nav_ranking -> {
-                    startActivity(Intent(this, AdminRankingActivity::class.java))
-                    true
-                }
+              R.id.nav_ranking_admin -> {
+                startActivity(Intent(this, AdminRankingActivity::class.java))
+                true
+              }
 
                 else -> false
             }

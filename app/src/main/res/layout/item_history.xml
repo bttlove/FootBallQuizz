@@ -1,53 +1,69 @@
 <LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:padding="8dp"
-  android:orientation="horizontal">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="horizontal"
+    android:background="@null"> <!-- Đảm bảo không có màu nền mặc định -->
 
   <!-- Player Name -->
   <TextView
-    android:id="@+id/tvPlayerName"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:text="Tên người chơi"
-    android:textColor="#000000" /> <!-- Black text color -->
+      android:id="@+id/tvPlayerName"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Tên người chơi"
+      android:textColor="#000000"
+      android:background="@null" /> <!-- Đặt background của TextView là null -->
+
+  <!-- Divider -->
+
 
   <!-- Score -->
   <TextView
-    android:id="@+id/tvScore"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:text="Điểm số"
-    android:textColor="#000000" /> <!-- Black text color -->
+      android:id="@+id/tvScore"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Điểm số"
+      android:textColor="#000000"
+      android:background="@null" /> <!-- Đặt background của TextView là null -->
+
+  <!-- Divider -->
+
 
   <!-- Difficulty -->
   <TextView
-    android:id="@+id/tvDifficulty"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:text="Độ khó"
-    android:textColor="#000000" /> <!-- Black text color -->
+      android:id="@+id/tvDifficulty"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Độ khó"
+      android:textColor="#000000"
+      android:background="@null" /> <!-- Đặt background của TextView là null -->
+
+
 
   <!-- Time Taken -->
   <TextView
-    android:id="@+id/tvTimeTaken"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:text="Thời gian thực hiện"
-    android:textColor="#000000" /> <!-- Black text color -->
+      android:id="@+id/tvTimeTaken"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Thời gian thực hiện"
+      android:textColor="#000000"
+      android:background="@null" /> <!-- Đặt background của TextView là null -->
+
+
 
   <!-- Total Time -->
   <TextView
-    android:id="@+id/tvTotalTime"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:layout_weight="1"
-    android:text="Thời gian hoàn thành"
-    android:textColor="#000000" /> <!-- Black text color -->
+      android:id="@+id/tvTotalTime"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:text="Thời gian hoàn thành"
+      android:textColor="#000000"
+      android:background="@null" />
 
 </LinearLayout>

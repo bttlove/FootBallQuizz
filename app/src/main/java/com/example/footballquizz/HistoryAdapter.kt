@@ -32,6 +32,7 @@ class HistoryAdapter(context: Context, historyList: List<ScoreModel>) : ArrayAda
     view.setBackgroundColor(backgroundColor)
 
     return view
+
   }
 }
 

@@ -82,18 +82,5 @@
       android:backgroundTint="@color/bg_main"
       android:layout_marginEnd="16dp" />
   <!-- ImageView for football players -->
-  <ImageView
-      android:id="@+id/imageView"
-      android:layout_width="142dp"
-      android:layout_height="140dp"
-      android:layout_marginHorizontal="16dp"
-      android:layout_marginTop="564dp"
-      android:scaleType="centerCrop"
-      android:src="@drawable/point_image"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintHeight_percent="0.4"
-      app:layout_constraintHorizontal_bias="1.0"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -65,7 +65,7 @@ class AdminActivity : AppCompatActivity() {
           true
         }
 
-        R.id.nav_ranking -> {
+        R.id.nav_ranking_admin -> {
           startActivity(Intent(this, AdminRankingActivity::class.java))
           true
         }

@@ -1,56 +1,38 @@
 package com.example.footballquizz
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 
-class HistoryAdapter(context: Context, private val historyList: List<ScoreModel>) :
-    ArrayAdapter<ScoreModel>(context, 0, historyList) {
+class HistoryAdapter(context: Context, historyList: List<ScoreModel>) : ArrayAdapter<ScoreModel>(context, 0, historyList) {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        var listItemView = convertView
+  override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_history, parent, false)
 
-        if (listItemView == null) {
-            listItemView = LayoutInflater.from(context).inflate(R.layout.item_history, parent, false)
-        }
+    val item = getItem(position)
+    val tvPlayerName: TextView = view.findViewById(R.id.tvPlayerName)
+    val tvScore: TextView = view.findViewById(R.id.tvScore)
+    val tvDifficulty: TextView = view.findViewById(R.id.tvDifficulty)
+    val tvTimeTaken: TextView = view.findViewById(R.id.tvTimeTaken)
+    val tvTotalTime: TextView = view.findViewById(R.id.tvTotalTime)
 
-        val currentScore = historyList[position]
+    // Set values to TextViews
+    tvPlayerName.text = item?.name
+    tvScore.text = item?.score
+    tvDifficulty.text = item?.difficulty
+    tvTimeTaken.text = item?.timeTaken
+    tvTotalTime.text = item?.time
 
-        val tvName = listItemView!!.findViewById<TextView>(R.id.tvName)
-        val tvScore = listItemView.findViewById<TextView>(R.id.tvScore)
-        val tvDifficulty = listItemView.findViewById<TextView>(R.id.tvDifficulty)
-        val tvTimeTaken = listItemView.findViewById<TextView>(R.id.tvTimeTaken)
-        val tvTime = listItemView.findViewById<TextView>(R.id.tvTime)
+    // Alternate background colors
+    val backgroundColor = if (position % 2 == 0) Color.WHITE else Color.LTGRAY
+    view.setBackgroundColor(backgroundColor)
 
-        // Thiết lập màu chữ ngẫu nhiên cho mỗi phần tử
-        val randomColor = getRandomColor()
-        tvName.setTextColor(randomColor)
-        tvScore.setTextColor(randomColor)
-        tvDifficulty.setTextColor(randomColor)
-        tvTimeTaken.setTextColor(randomColor)
-        tvTime.setTextColor(randomColor)
+    return view
 
-        tvName.text = "Tên: ${currentScore.name}"
-        tvScore.text = "Điểm: ${currentScore.score}"
-        tvDifficulty.text = "Chế độ: ${currentScore.difficulty}"
-        tvTimeTaken.text = "Thời gian hoàn thành: ${currentScore.timeTaken} giây"
-        tvTime.text = "Thời gian: ${currentScore.time}"
-
-        return listItemView
-    }
-
-    private fun getRandomColor(): Int {
-        val colors = listOf(
-            android.graphics.Color.RED,
-            android.graphics.Color.WHITE,
-            android.graphics.Color.GREEN,
-            android.graphics.Color.YELLOW,
-            android.graphics.Color.CYAN,
-            android.graphics.Color.MAGENTA
-        )
-        return colors.random()
-    }
+  }
 }
+

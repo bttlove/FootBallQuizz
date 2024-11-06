@@ -7,6 +7,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,9 +34,18 @@ class DifficultySelectionActivity : AppCompatActivity() {
         val db = FirebaseFirestore.getInstance()
         db.collection("auths").document(userId).get().addOnSuccessListener { document ->
           val imageUrl = document.getString("image_url")
+
           if (imageUrl != null && imageUrl.isNotEmpty()) {
             val profileImageView: ImageView = findViewById(R.id.profile_icon)
-            Glide.with(this).load(imageUrl).into(profileImageView)
+
+            // Tạo RequestOptions với circleCrop và kích thước tùy chỉnh
+            val requestOptions = RequestOptions().circleCrop().override(150, 150)
+
+            // Sử dụng Glide với RequestOptions
+            Glide.with(this)
+              .load(imageUrl)
+              .apply(requestOptions)
+              .into(profileImageView)
           }
         }
 
@@ -113,8 +123,7 @@ class DifficultySelectionActivity : AppCompatActivity() {
   }
 
   private fun startPracticeActivity() {
-    val intent = Intent(this, QuizActivity::class.java)
-    intent.putExtra("DIFFICULTY", "practice")
+    val intent = Intent(this, QuizPracticeActivity::class.java)
     startActivity(intent)
   }
 }

@@ -10,64 +10,71 @@ import com.google.firebase.firestore.FirebaseFirestore
 
 class Profile_UserActivity : AppCompatActivity() {
 
-    private val db = FirebaseFirestore.getInstance()
-    private lateinit var listViewHistory: ListView
-    private lateinit var historyAdapter: HistoryAdapter
-    private var historyList = mutableListOf<ScoreModel>()
+  private val db = FirebaseFirestore.getInstance()
+  private lateinit var listViewHistory: ListView
+  private lateinit var historyAdapter: HistoryAdapter
+  private var historyList = mutableListOf<ScoreModel>()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.profile_user)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.profile_user)
 
-        listViewHistory =
-            findViewById(R.id.listViewHistory) // Ensure you have this ListView in activity_profile.xml
+    listViewHistory = findViewById(R.id.listViewHistory)
 
+    val userEmail = intent.getStringExtra("USER_EMAIL")
 
-        val userEmail = intent.getStringExtra("USER_EMAIL")
+    if (userEmail != null) {
+      // Fetch scores from Firestore for the given user email
+      db.collection("score")
+        .whereEqualTo("e-mail", userEmail)
+        .get()
+        .addOnSuccessListener { documents ->
+          for (document in documents) {
+            val score = document.getString("point") ?: ""
+            val name = document.getString("name") ?: ""
+            val difficulty = document.getString("difficulty") ?: ""
+            val timeTaken = document.getString("timeTaken") ?: ""
+            val time = document.getString("time") ?: ""
 
-        if (userEmail != null) {
-            // Fetch scores from Firestore for the given user email
-            db.collection("score")
-                .whereEqualTo("e-mail", userEmail)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        val score = document.getString("point") ?: ""
-                        val name = document.getString("name") ?: ""
-                        val difficulty = document.getString("difficulty") ?: ""
-                        val timeTaken = document.getString("timeTaken") ?: ""
-                        val time = document.getString("time") ?: ""
+            val scoreModel = ScoreModel(
+              name = name,
+              score = score,
+              difficulty = difficulty,
+              timeTaken = timeTaken,
+              time = time
+            )
+            historyList.add(scoreModel)
+          }
 
-                        val scoreModel = ScoreModel(
-                            name = name,
-                            score = score,
-                            difficulty = difficulty,
-                            timeTaken = timeTaken,
-                            time = time
-                        )
-                        historyList.add(scoreModel)
-                    }
-
-                    // Set up adapter
-                    historyAdapter = HistoryAdapter(this, historyList)
-                    listViewHistory.adapter = historyAdapter
-                }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Failed to fetch history: $e", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show()
+          // Set up adapter
+          historyAdapter = HistoryAdapter(this, historyList)
+          listViewHistory.adapter = historyAdapter  // Corrected line
         }
-        // Set up bottom navigation
-        val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_user)
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_ranking -> {
-                    startActivity(Intent(this, RankingActivity::class.java))
-                    true
-                }
-                else -> false
-            }
+        .addOnFailureListener { e ->
+          Toast.makeText(this, "Failed to fetch history: $e", Toast.LENGTH_SHORT).show()
         }
+    } else {
+      Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show()
     }
+
+    // Set up bottom navigation
+    val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_user)
+    bottomNavigation.setOnItemSelectedListener { item ->
+      when (item.itemId) {
+        R.id.nav_home_admin -> {
+          startActivity(Intent(this, AdminActivity::class.java))
+          true
+        }
+        R.id.nav_player_management -> {
+          startActivity(Intent(this, PlayerManagementAdmin::class.java))
+          true
+        }
+        R.id.nav_ranking -> {
+          startActivity(Intent(this, RankingActivity::class.java))
+          true
+        }
+        else -> false
+      }
+    }
+  }
 }

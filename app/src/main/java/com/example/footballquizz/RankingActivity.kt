@@ -285,7 +285,7 @@ class RankingActivity : AppCompatActivity() {
                 if (scoreResult.documents.isNotEmpty()) {
                     val email = scoreResult.documents[0].getString("e-mail") // Lấy email từ kết quả
                     if (email != null) {
-                        val intent = Intent(this@RankingActivity, Profile_UserActivity::class.java)
+                        val intent = Intent(this@RankingActivity, HistoryActivity::class.java)
                         intent.putExtra("USER_EMAIL", email)
                         startActivity(intent)
                     }

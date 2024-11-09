@@ -44,6 +44,12 @@
     <string name="random_button_text">Random</string>
     <string name="hard_button_text">Hard</string>
     <string name="normal_button_text">Normal</string>
-
+    <string-array name="sort_options">
+        <item>Sort by Name</item>
+        <item>Sort by Score</item>
+        <item>Sort by Date</item>
+        <item>Sort by Time</item>
+        <item>Sort by Difficulty</item>
+    </string-array>
 
 </resources>

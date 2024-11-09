@@ -1,5 +1,4 @@
 package com.example.footballquizz
-
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -25,15 +24,12 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         // Initialize Firebase Auth and Firestore
         auth = FirebaseAuth.getInstance()
         auth.signOut()
         db = FirebaseFirestore.getInstance()
-
         // Set layout for LoginActivity
         setContentView(R.layout.activity_login)
-
         // Initialize views
         inputEmail = findViewById(R.id.email)
         inputPassword = findViewById(R.id.password)
@@ -150,7 +146,7 @@ class LoginActivity : AppCompatActivity() {
 
                     if (role == "admin") {
                         // Chuyển đến HomeAdminActivity nếu người dùng là admin
-                        startActivity(Intent(this@LoginActivity, HomeAdminActivity::class.java))
+                        startActivity(Intent(this@LoginActivity, AdminActivity::class.java))
                         finish()
                     } else {
                         promptForPassword(email)

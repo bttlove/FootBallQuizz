@@ -80,7 +80,8 @@ class ScoreActivity : AppCompatActivity() {
         "point" to score.toString(),
         "difficulty" to difficulty,
         "timeTaken" to timeFormatted,
-        "time" to currentTime
+        "time" to currentTime,
+        "date" to SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(Date())
       )
 
       // Push data to Firestore in the "score" collection

@@ -56,8 +56,6 @@
             android:exported="true"/>
 
 
-        <activity android:name=".HomePageActivity"
-            android:exported="true"/>
         <activity android:name=".RankingActivity"
             android:exported="true"/>
         <activity android:name=".HistoryActivity"
@@ -66,7 +64,7 @@
             android:exported="true"/>
         <activity android:name=".PlayerManagementAdmin"
             android:exported="true"/>
-        <activity android:name=".HomeAdminActivity"
+        <activity android:name=".AdminSettingActivity"
             android:exported="true"/>
         <activity android:name=".AdminRankingActivity"
             android:exported="true"/>

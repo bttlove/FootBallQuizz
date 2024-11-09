@@ -1,7 +1,9 @@
 
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+   // Phiên bản có thể thay đổi, kiểm tra tại https://firebase.google.com/docs/android/setup
 
     id("com.google.gms.google-services")
     id ("kotlin-kapt")
@@ -64,6 +66,7 @@ dependencies {
     implementation ("androidx.core:core:1.10.1")
     implementation ("androidx.appcompat:appcompat:1.7.0")
     kapt("com.github.bumptech.glide:compiler:4.12.0")
-
+    implementation ("com.squareup.picasso:picasso:2.71828")
+    implementation ("com.google.firebase:firebase-storage")
 
 }

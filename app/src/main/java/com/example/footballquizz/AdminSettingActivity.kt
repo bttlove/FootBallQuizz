@@ -1,22 +1,26 @@
 package com.example.footballquizz
+
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-class AdminSettingActivity : AppCompatActivity(){
+
+class AdminSettingActivity : AppCompatActivity() {
     private lateinit var imgProfilePicture: ImageView
     private lateinit var tvName: TextView
     private lateinit var tvEmail: TextView
     private lateinit var tvPhone: TextView
     private lateinit var tvBoD: TextView
     private lateinit var tvPosition: TextView
-
+    private lateinit var btnLogout: Button
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
@@ -30,8 +34,16 @@ class AdminSettingActivity : AppCompatActivity(){
         tvPhone = findViewById(R.id.tvPhone)
         tvBoD = findViewById(R.id.tvBoD)
         tvPosition = findViewById(R.id.tvPosition)
-
+        btnLogout = findViewById(R.id.btn_logout)
         fetchUserData()
+        btnLogout.setOnClickListener {
+            auth.signOut()
+            Toast.makeText(this, "Đã đăng xuất thành công", Toast.LENGTH_SHORT).show()
+            // Chuyển về màn hình đăng nhập
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_admin)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -52,22 +64,16 @@ class AdminSettingActivity : AppCompatActivity(){
         }
     }
 
-
-
     private fun fetchUserData() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
             val userEmail = currentUser.email
             if (userEmail != null) {
-                db.collection("users")
-                    .whereEqualTo("e-mail", userEmail)
+                db.collection("user")
+                    .document(userEmail) // Truy cập trực tiếp vào tài liệu với userEmail
                     .get()
-                    .addOnSuccessListener { documents ->
-                        if (documents.isEmpty) {
-                            Toast.makeText(this, "Không tìm thấy dữ liệu người dùng", Toast.LENGTH_SHORT).show()
-                            return@addOnSuccessListener
-                        }
-                        for (document in documents) {
+                    .addOnSuccessListener { document ->
+                        if (document.exists()) {
                             val name = document.getString("name")
                             val email = document.getString("e-mail")
                             val phone = document.getString("Phone")
@@ -78,13 +84,18 @@ class AdminSettingActivity : AppCompatActivity(){
                             tvName.text = "Họ và Tên: $name"
                             tvEmail.text = "E-mail: $email"
                             tvPhone.text = "Số điện thoại: $phone"
-                            tvBoD.text = "BoD: $bod"
+                            tvBoD.text = "Ngày sinh: $bod"
                             tvPosition.text = "Vị trí: $role"
 
-                            // Load the profile picture with Glide
+                            // Load ảnh đại diện bằng Glide
+                            val requestOptions = RequestOptions().circleCrop().override(150, 150)
                             Glide.with(this)
                                 .load(imageUrl)
+
+                                .apply(requestOptions)
                                 .into(imgProfilePicture)
+                        } else {
+                            Toast.makeText(this, "Không tìm thấy dữ liệu người dùng", Toast.LENGTH_SHORT).show()
                         }
                     }
                     .addOnFailureListener { exception ->
@@ -96,6 +107,5 @@ class AdminSettingActivity : AppCompatActivity(){
         } else {
             Toast.makeText(this, "Người dùng chưa đăng nhập", Toast.LENGTH_SHORT).show()
         }
-
     }
 }

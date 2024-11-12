@@ -7,7 +7,7 @@
   android:layout_height="match_parent"
   android:padding="16dp"
   android:background="#F3F4F6"
-  tools:context=".QuizActivity">
+  tools:context=".QuizTryhardActivity">
 
   <!-- Hình ảnh cầu thủ -->
   <ImageView

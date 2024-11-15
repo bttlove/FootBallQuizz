@@ -4,6 +4,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -46,6 +47,8 @@
             android:exported="true"/>
       <activity android:name=".QuizPracticeActivity"
         android:exported="true"/>
+      <activity android:name=".QuizTryhardActivity"
+        android:exported="true"/>
         <activity android:name=".ScoreActivity"
             android:exported="true"/>
         <!-- Khai báo SignupActivity -->
@@ -55,8 +58,6 @@
             android:exported="true"/>
 
 
-        <activity android:name=".HomePageActivity"
-            android:exported="true"/>
         <activity android:name=".RankingActivity"
             android:exported="true"/>
         <activity android:name=".HistoryActivity"
@@ -65,7 +66,7 @@
             android:exported="true"/>
         <activity android:name=".PlayerManagementAdmin"
             android:exported="true"/>
-        <activity android:name=".HomeAdminActivity"
+        <activity android:name=".AdminSettingActivity"
             android:exported="true"/>
         <activity android:name=".AdminRankingActivity"
             android:exported="true"/>

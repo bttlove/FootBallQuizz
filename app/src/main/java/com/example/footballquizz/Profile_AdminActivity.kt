@@ -2,63 +2,68 @@ package com.example.footballquizz
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.widget.ImageButton
 import android.widget.ListView
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 class Profile_AdminActivity : AppCompatActivity() {
 
     private val db = FirebaseFirestore.getInstance()
+    private val auth = FirebaseAuth.getInstance()
+
     private lateinit var listViewHistory: ListView
     private lateinit var historyAdapter: HistoryAdapter
+    private lateinit var searchView: SearchView
+    private lateinit var btnSort: ImageButton
     private var historyList = mutableListOf<ScoreModel>()
+
+    // Boolean to track sort order (ascending by default)
+    private var isAscending = true
+    private var currentSortCriteria = "name"  // Default sorting by name
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.profile_admin)
 
-        listViewHistory =
-            findViewById(R.id.listViewHistory) // Ensure you have this ListView in activity_profile.xml
+        listViewHistory = findViewById(R.id.listViewHistory)
+        searchView = findViewById(R.id.searchView)
+        btnSort = findViewById(R.id.btnSort)
+        setupBottomNavigation()
 
-        // Get the email passed from the PlayerManagementAdmin activity
-        val userEmail = intent.getStringExtra("USER_EMAIL")
-
-        if (userEmail != null) {
-            // Fetch scores from Firestore for the given user email
-            db.collection("score")
-                .whereEqualTo("e-mail", userEmail)
-                .get()
-                .addOnSuccessListener { documents ->
-                    for (document in documents) {
-                        val score = document.getString("point") ?: ""
-                        val name = document.getString("name") ?: ""
-                        val difficulty = document.getString("difficulty") ?: ""
-                        val timeTaken = document.getString("timeTaken") ?: ""
-                        val time = document.getString("time") ?: ""
-
-                        val scoreModel = ScoreModel(
-                            name = name,
-                            score = score,
-                            difficulty = difficulty,
-                            timeTaken = timeTaken,
-                            time = time
-                        )
-                        historyList.add(scoreModel)
-                    }
-
-                    // Set up adapter
-                  historyAdapter = HistoryAdapter(this, historyList)
-                  listViewHistory.adapter = historyAdapter
-                  }
-                .addOnFailureListener { e ->
-                    Toast.makeText(this, "Failed to fetch history: $e", Toast.LENGTH_SHORT).show()
-                }
-        } else {
-            Toast.makeText(this, "User email not found", Toast.LENGTH_SHORT).show()
+        val userEmail = intent.getStringExtra("USER_EMAIL") ?: auth.currentUser?.email
+        if (userEmail == null) {
+            Toast.makeText(this, "User email not provided!", Toast.LENGTH_SHORT).show()
+            return
         }
-        // Set up bottom navigation
+
+        fetchHistoryData(userEmail)
+
+        // Setup search functionality
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                historyAdapter.filter.filter(query)
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                historyAdapter.filter.filter(newText)
+                return false
+            }
+        })
+
+        // Setup sort menu
+        btnSort.setOnClickListener { showSortMenu() }
+    }
+
+    private fun setupBottomNavigation() {
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_admin)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -72,13 +77,88 @@ class Profile_AdminActivity : AppCompatActivity() {
                     true
                 }
 
-              R.id.nav_ranking_admin -> {
-                startActivity(Intent(this, AdminRankingActivity::class.java))
-                true
-              }
+                R.id.nav_ranking_admin -> {
+                    startActivity(Intent(this, AdminRankingActivity::class.java))
+                    true
+                }
+                R.id.nav_settings_admin -> {
+                    startActivity(Intent(this, AdminSettingActivity::class.java))
+                    true
+                }
 
                 else -> false
             }
         }
+    }
+
+    private fun fetchHistoryData(userEmail: String) {
+        db.collection("score")
+            .whereEqualTo("e-mail", userEmail)
+            .get()
+            .addOnSuccessListener { documents ->
+                historyList.clear()
+                for (document in documents) {
+                    val scoreModel = ScoreModel(
+                        name = document.getString("name") ?: "",
+                        score = document.getString("point") ?: "",
+                        difficulty = document.getString("difficulty") ?: "",
+                        timeTaken = document.getString("timeTaken") ?: "",
+                        time = document.getString("time") ?: "",
+                        date = document.getString("date") ?: ""
+                    )
+                    historyList.add(scoreModel)
+                }
+
+                historyAdapter = HistoryAdapter(this, historyList)
+                listViewHistory.adapter = historyAdapter
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Failed to fetch history: $e", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun showSortMenu() {
+        val popupMenu = androidx.appcompat.widget.PopupMenu(this, btnSort)
+        val inflater: MenuInflater = popupMenu.menuInflater
+        inflater.inflate(R.menu.menu_sort, popupMenu.menu)
+        popupMenu.setOnMenuItemClickListener { menuItem: MenuItem ->
+            when (menuItem.itemId) {
+                R.id.sort_name -> {
+                    currentSortCriteria = "name"
+                    sortHistory()
+                }
+                R.id.sort_score -> {
+                    currentSortCriteria = "score"
+                    sortHistory()
+                }
+                R.id.sort_date -> {
+                    currentSortCriteria = "date"
+                    sortHistory()
+                }
+                R.id.sort_difficulty -> {
+                    currentSortCriteria = "difficulty"
+                    sortHistory()
+                }
+                R.id.sort_time -> {
+                    currentSortCriteria = "time"
+                    sortHistory()
+                }
+                R.id.sort_ascending -> {
+                    isAscending = true
+                    sortHistory()
+                }
+                R.id.sort_descending -> {
+                    isAscending = false
+                    sortHistory()
+                }
+            }
+            true
+        }
+        popupMenu.show()
+    }
+
+    private fun sortHistory() {
+        historyAdapter.sortList(currentSortCriteria, isAscending)
+        historyAdapter.notifyDataSetChanged()
     }
 }

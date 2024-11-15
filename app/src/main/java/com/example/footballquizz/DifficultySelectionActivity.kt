@@ -114,6 +114,9 @@ class DifficultySelectionActivity : AppCompatActivity() {
     findViewById<Button>(R.id.btnPractice).setOnClickListener {
       startPracticeActivity()
     }
+    findViewById<Button>(R.id.btnTryHard).setOnClickListener {
+      startTryHardActivity()
+    }
   }
 
   private fun startQuizActivity(difficulty: String) {
@@ -124,6 +127,10 @@ class DifficultySelectionActivity : AppCompatActivity() {
 
   private fun startPracticeActivity() {
     val intent = Intent(this, QuizPracticeActivity::class.java)
+    startActivity(intent)
+  }
+  private fun startTryHardActivity() {
+    val intent = Intent(this, QuizTryhardActivity::class.java)
     startActivity(intent)
   }
 }

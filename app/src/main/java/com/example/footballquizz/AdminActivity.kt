@@ -1,5 +1,4 @@
 package com.example.footballquizz
-
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -67,6 +66,10 @@ class AdminActivity : AppCompatActivity() {
 
         R.id.nav_ranking_admin -> {
           startActivity(Intent(this, AdminRankingActivity::class.java))
+          true
+        }
+        R.id.nav_settings_admin -> {
+          startActivity(Intent(this, AdminSettingActivity::class.java))
           true
         }
 

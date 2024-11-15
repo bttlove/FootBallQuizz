@@ -10,21 +10,19 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import android.os.CountDownTimer
+import android.widget.ProgressBar
 
 open class QuizActivity : AppCompatActivity() {
 
-  private lateinit var tvQuestion: TextView
-  private lateinit var btnAnswer1: Button
-  private lateinit var btnAnswer2: Button
-  private lateinit var btnAnswer3: Button
-  private lateinit var btnAnswer4: Button
+  lateinit var tvQuestion: TextView
+  lateinit var btnAnswer1: Button
+  lateinit var btnAnswer2: Button
+  lateinit var btnAnswer3: Button
+  lateinit var btnAnswer4: Button
   private lateinit var ivPlayerImage: ImageView
   private lateinit var tvTimer: TextView
 
   private var easyQuestionsAsked = 0
-  private var easyCorrectAnswers = 0
-  private var mediumCorrectAnswers = 0
-  private var hardCorrectAnswers = 0
   private var mediumQuestionsAsked = 0
   private var hardQuestionsAsked = 0
   private var correctAnswers = 0
@@ -32,7 +30,7 @@ open class QuizActivity : AppCompatActivity() {
   private var timer: CountDownTimer? = null
 
   private lateinit var players: List<QuizzModel>
-  private lateinit var correctAnswer: String
+  lateinit var correctAnswer: String
   private var difficulty: String? = null
   private var questionIndex = 0
   private var difficultyMix: List<String> = listOf()
@@ -42,6 +40,7 @@ open class QuizActivity : AppCompatActivity() {
   private var currentQuestionDifficulty: String = "easy"
   private var score: Int = 0
   private var isPracticeMode = false
+  private lateinit var progressBarTimer: ProgressBar
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -54,7 +53,8 @@ open class QuizActivity : AppCompatActivity() {
     btnAnswer3 = findViewById(R.id.btnAnswer3)
     btnAnswer4 = findViewById(R.id.btnAnswer4)
     ivPlayerImage = findViewById(R.id.ivPlayerImage)
-    tvTimer = findViewById(R.id.tvTimer)
+    progressBarTimer = findViewById(R.id.progressBarTimer)
+    progressBarTimer.progress = 100
 
     difficulty = intent.getStringExtra("DIFFICULTY")
     isPracticeMode = difficulty == "practice"
@@ -87,7 +87,7 @@ open class QuizActivity : AppCompatActivity() {
     return difficulties.shuffled()
   }
 
-  private fun setupQuiz() {
+  fun setupQuiz() {
     if (questionIndex >= difficultyMix.size) {
       if (!isPracticeMode) {
         navigateToScoreActivity()
@@ -136,28 +136,24 @@ open class QuizActivity : AppCompatActivity() {
   }
 
   private fun setupAnswerOptions(correct: String, wrong1: String, wrong2: String) {
-    val answers = mutableListOf(correct)
-    val wrongAnswers = players.filter {
-      it.name != correct &&
-        it.club != wrong1 &&
-        it.yearOfBirth.toString() != wrong2
-    }.shuffled().take(3)
+    // Select relevant wrong answers based on the current question's difficulty
+    val wrongAnswers = when (currentQuestionDifficulty) {
+      "easy" -> players.filter { it.club != correct }.map { it.club }  // Filter clubs
+      "medium" -> players.filter { it.name != correct }.map { it.name }  // Filter names
+      "hard" -> players.filter { it.yearOfBirth.toString() != correct }.map { it.yearOfBirth.toString() }  // Filter birth years
+      else -> emptyList()
+    }.shuffled().take(3)  // Get 3 unique wrong answers
 
-    answers.addAll(wrongAnswers.map {
-      when (difficultyMix[questionIndex - 1]) {
-        "easy" -> it.club
-        "medium" -> it.name
-        "hard" -> it.yearOfBirth.toString()
-        else -> ""
-      }
-    })
+    // Add the correct answer and shuffle
+    val answers = mutableListOf(correct).apply { addAll(wrongAnswers) }.shuffled()
 
-    answers.shuffle()
+    // Set answers to buttons
     btnAnswer1.text = answers[0]
     btnAnswer2.text = answers[1]
     btnAnswer3.text = answers[2]
     btnAnswer4.text = answers[3]
   }
+
 
   private fun setupAnswerButtons() {
     val clickListener = View.OnClickListener { view ->
@@ -198,7 +194,7 @@ open class QuizActivity : AppCompatActivity() {
     btnAnswer3.setOnClickListener(clickListener)
     btnAnswer4.setOnClickListener(clickListener)
   }
-  private fun resetAnswerButtonColors() {
+  fun resetAnswerButtonColors() {
     btnAnswer1.setBackgroundColor(resources.getColor(R.color.bg_main))
     btnAnswer2.setBackgroundColor(resources.getColor(R.color.bg_main))
     btnAnswer3.setBackgroundColor(resources.getColor(R.color.bg_main))
@@ -222,27 +218,24 @@ open class QuizActivity : AppCompatActivity() {
   }
 
   private fun startCountdownTimer() {
-    remainingTimeInMillis = 20000
-    tvTimer.text = formatTime(remainingTimeInMillis)
-
-    timer = object : CountDownTimer(remainingTimeInMillis, 1000) {
+    val totalTime = 15000L // 20 seconds in milliseconds
+    progressBarTimer.max = (totalTime / 1000).toInt()
+    remainingTimeInMillis = totalTime
+    timer = object : CountDownTimer(totalTime, 1000) {
       override fun onTick(millisUntilFinished: Long) {
         remainingTimeInMillis = millisUntilFinished
-        tvTimer.text = formatTime(remainingTimeInMillis)
+        val secondsRemaining = (millisUntilFinished / 1000).toInt() // Calculate full seconds remaining
+        progressBarTimer.progress = secondsRemaining // Set progress in seconds
       }
 
       override fun onFinish() {
         tvQuestion.text = "Hết thời gian! Đáp án đúng là: $correctAnswer"
+        progressBarTimer.progress = 0
         incorrectAnswers++
         displayScore()
         setupQuiz()
       }
     }.start()
-  }
-
-  private fun formatTime(millis: Long): String {
-    val seconds = (millis / 1000).toInt()
-    return String.format("%02d:%02d", seconds / 60, seconds % 60)
   }
 
   private fun navigateToScoreActivity() {

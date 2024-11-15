@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/sort_name" android:title="Tên"/>
+    <item android:id="@+id/sort_score" android:title="Điểm"/>
+    <item android:id="@+id/sort_date" android:title="Ngày"/>
+    <item android:id="@+id/sort_difficulty" android:title="Chế Độ"/>
+    <item android:id="@+id/sort_time" android:title="Giờ"/>
+
+    <item android:title="Sắp xếp">
+        <menu>
+            <item android:id="@+id/sort_ascending" android:title="Tăng dần"/>
+            <item android:id="@+id/sort_descending" android:title="Giảm dần"/>
+        </menu>
+    </item>
+</menu>

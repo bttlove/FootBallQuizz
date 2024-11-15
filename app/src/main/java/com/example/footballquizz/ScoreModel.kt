@@ -5,5 +5,6 @@ data class ScoreModel(
     val score: String,
     val difficulty: String,
     val timeTaken: String,
-    val time: String
+    val time: String,
+    val date: String
 )

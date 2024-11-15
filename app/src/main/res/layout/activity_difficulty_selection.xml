@@ -193,6 +193,18 @@
       android:text="Luyện Tập"
       android:textColor="#FFFFFF"
       android:textSize="20sp" />
+    <Button
+      android:id="@+id/btnTryHard"
+      android:layout_width="0dp"
+      android:layout_height="100dp"
+      android:layout_weight="1"
+      android:layout_margin="8dp"
+      android:backgroundTint="#6B4226"
+
+      android:drawablePadding="8dp"
+      android:text="Try Hard"
+      android:textColor="#FFFFFF"
+      android:textSize="20sp" />
   </LinearLayout>
 
   <com.google.android.material.bottomnavigation.BottomNavigationView

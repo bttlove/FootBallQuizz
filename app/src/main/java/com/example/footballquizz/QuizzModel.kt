@@ -2,10 +2,10 @@ package com.example.footballquizz
 
 data class QuizzModel(
 
-  val  name: String = "",
-  val yearOfBirth: Int = 0,
-  val club: String = "",
-  val imageUrl: String = "",
+  var  name: String = "",
+  var yearOfBirth: Int = 0,
+  var club: String = "",
+  var imageUrl: String = "",
   var id: String? = null,
 ){
 

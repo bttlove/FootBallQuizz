@@ -57,8 +57,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     startActivity(Intent(this, AdminRankingActivity::class.java))
                     true
                 }
-                R.id.nav_player_management -> {
-                    startActivity(Intent(this, PlayerManagementAdmin::class.java))
+                R.id.nav_settings_admin -> {
+                    startActivity(Intent(this, AdminSettingActivity::class.java))
                     true
                 }
                 else -> false

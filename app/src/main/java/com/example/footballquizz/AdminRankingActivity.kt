@@ -1,9 +1,6 @@
 package com.example.footballquizz
-
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
@@ -12,6 +9,8 @@ import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -29,12 +28,13 @@ class AdminRankingActivity : AppCompatActivity() {
     private lateinit var rankingListLayout: LinearLayout
     private lateinit var nextPageButton: Button
     private lateinit var previousPageButton: Button
-
     private val db = FirebaseFirestore.getInstance()
     private var currentPage = 0
     private val itemsPerPage = 10
     private var rankingListItems: MutableList<Pair<String, Double>> = mutableListOf()
     private lateinit var pageNumberTextView: TextView
+    private var searchResultsItems: MutableList<Pair<String, Double>> = mutableListOf() // Lưu trữ kết quả tìm kiếm
+    private var isSearching = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,44 +72,55 @@ class AdminRankingActivity : AppCompatActivity() {
             }
         }
 
+        val recyclerView: RecyclerView = findViewById(R.id.playersRecyclerView)
+        val playerList = mutableListOf<Pair<String, Double>>()
+        val adapter = RankingAdapter(playerList)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        searchPlayerRankingAdminEditText.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable?) {}
+        loadRankingData(adapter)
 
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s.toString().trim()
-                if (query.isNotEmpty()) {
-                    when {
-                        query.contains("@") -> {
-                            searchByEmail(query)
-                        }
-                        query.toDoubleOrNull() != null -> {
-                            searchByScore(query.toDouble())
-                        }
-                        else -> {
-                            searchByName(query)
-                        }
+        addPlayerRankingAdminButton.setOnClickListener {
+            isToastShown = false
+            val query = searchPlayerRankingAdminEditText.text.toString().trim()
+            if (query.isNotEmpty()) {
+
+                isSearching = true
+                currentPage = 0
+                searchResultsItems.clear()
+
+                when {
+                    query.contains("@") -> {
+                        searchByEmail(query)
                     }
-                } else {
-                    loadRankingData()
+                    query.toDoubleOrNull() != null -> {
+                        searchByScore(query.toDouble())
+                    }
+                    else -> {
+                        searchByName(query)
+                    }
                 }
+            } else {
+                isSearching = false
+                currentPage = 0
+                loadRankingData(adapter)
             }
-        })
+        }
 
         nextPageButton.setOnClickListener {
             currentPage++
-            loadRankingData()
+            loadRankingData(adapter)
         }
 
         previousPageButton.setOnClickListener {
             if (currentPage > 0) {
                 currentPage--
-                loadRankingData()
+                loadRankingData(adapter)
             }
         }
-        loadRankingData()
+
+        loadRankingData(adapter)
     }
 
 
@@ -118,19 +129,13 @@ class AdminRankingActivity : AppCompatActivity() {
             .whereEqualTo("e-mail", email)
             .get()
             .addOnSuccessListener { scoreResult ->
-                val searchResults: MutableList<Pair<String, Double>> = mutableListOf()
-
                 for (document in scoreResult) {
                     val playerName = document.getString("name") ?: "No Name"
                     val playerPointString = document.getString("point") ?: "0"
                     val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
 
-                    searchResults.add(Pair(playerName, playerPoint))
+                    searchResultsItems.add(Pair(playerName, playerPoint))
                 }
-
-                rankingListItems = rankingListItems.take(3).toMutableList()
-                rankingListItems.addAll(searchResults.sortedByDescending { it.second })
-
                 updateRankingUI()
             }
             .addOnFailureListener { e ->
@@ -138,26 +143,19 @@ class AdminRankingActivity : AppCompatActivity() {
             }
     }
 
-
     private fun searchByName(name: String) {
         db.collection("score")
-            .whereGreaterThanOrEqualTo("name", name)
-            .whereLessThanOrEqualTo("name", name + '\uf8ff')
             .get()
             .addOnSuccessListener { scoreResult ->
-                val searchResults: MutableList<Pair<String, Double>> = mutableListOf()
-
                 for (document in scoreResult) {
                     val playerName = document.getString("name") ?: "No Name"
                     val playerPointString = document.getString("point") ?: "0"
                     val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
 
-                    searchResults.add(Pair(playerName, playerPoint))
+                    if (playerName.contains(name, ignoreCase = true)) {
+                        searchResultsItems.add(Pair(playerName, playerPoint))
+                    }
                 }
-
-                rankingListItems = rankingListItems.take(3).toMutableList()
-                rankingListItems.addAll(searchResults.sortedByDescending { it.second })
-
                 updateRankingUI()
             }
             .addOnFailureListener { e ->
@@ -166,41 +164,60 @@ class AdminRankingActivity : AppCompatActivity() {
     }
 
     private fun searchByScore(score: Double) {
+        searchResultsItems.clear()
         db.collection("score")
             .get()
-            .addOnSuccessListener { scoreResult ->
-                val searchResults: MutableList<Pair<String, Double>> = mutableListOf()
+            .addOnSuccessListener { querySnapshot ->
+                var foundResults = false
 
-                for (document in scoreResult) {
+                for (document in querySnapshot) {
                     val playerName = document.getString("name") ?: "No Name"
-                    val playerPointString = document.getString("point") ?: "0"
-                    val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
+                    val pointString = document.getString("point") ?: "0"
+
+
+                    val playerPoint = try {
+                        pointString.toDouble()
+                    } catch (e: NumberFormatException) {
+                        0.0
+                    }
+
+
                     if (playerPoint == score) {
-                        searchResults.add(Pair(playerName, playerPoint))
+                        searchResultsItems.add(Pair(playerName, playerPoint))
+                        foundResults = true
                     }
                 }
 
-                rankingListItems = rankingListItems.take(3).toMutableList()
-                rankingListItems.addAll(searchResults.sortedByDescending { it.second })
+
+                isSearching = true
+                if (foundResults) {
+                    Toast.makeText(this, "Tìm thấy ${searchResultsItems.size} người chơi có điểm $score", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Không tìm thấy người chơi có điểm $score", Toast.LENGTH_SHORT).show()
+                }
+
                 updateRankingUI()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Không tìm thấy người chơi với điểm $score: $e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Lỗi khi tìm kiếm: $e", Toast.LENGTH_SHORT).show()
             }
+
     }
 
-
-    private fun loadRankingData() {
+    private fun loadRankingData(adapter: RankingAdapter) {
         db.collection("score")
             .get()
-            .addOnSuccessListener { result ->
+            .addOnSuccessListener { querySnapshot ->
                 rankingListItems.clear()
 
-                for (document in result) {
+                for (document in querySnapshot) {
                     val playerName = document.getString("name") ?: "No Name"
-                    val playerPointString = document.getString("point") ?: "0"
-                    val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
-
+                    val pointString = document.getString("point") ?: "0"
+                    val playerPoint = try {
+                        pointString.toDouble()
+                    } catch (e: NumberFormatException) {
+                        0.0
+                    }
                     rankingListItems.add(Pair(playerName, playerPoint))
                 }
 
@@ -214,7 +231,6 @@ class AdminRankingActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to load ranking: $e", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun updateTop3PlayersWithImages() {
         for (i in 0 until minOf(3, rankingListItems.size)) {
@@ -241,6 +257,7 @@ class AdminRankingActivity : AppCompatActivity() {
                                 }
                             }
                             .addOnFailureListener {
+
                             }
                     }
                 }
@@ -254,7 +271,8 @@ class AdminRankingActivity : AppCompatActivity() {
             2 -> thirdPlaceName
             else -> return
         }
-        textView.text = "$playerName - $playerPoints points"
+
+        textView.text = "$playerName $playerPoints "
 
         val imageView = when (index) {
             0 -> firstPlaceImage_admin
@@ -267,13 +285,18 @@ class AdminRankingActivity : AppCompatActivity() {
             navigateToProfile(playerName)
         }
 
-
         imageView?.setOnClickListener {
             navigateToProfile(playerName)
         }
 
+
         imageView?.let {
-            Glide.with(this).load(imageUrl).into(it)
+            Glide.with(this)
+                .load(imageUrl)
+                .circleCrop()
+                .placeholder(R.drawable.hinh1)
+                .into(it)
+
         }
     }
 
@@ -285,7 +308,7 @@ class AdminRankingActivity : AppCompatActivity() {
                 if (scoreResult.documents.isNotEmpty()) {
                     val email = scoreResult.documents[0].getString("e-mail") // Lấy email từ kết quả
                     if (email != null) {
-                        val intent = Intent(this@AdminRankingActivity, Profile_AdminActivity::class.java)
+                        val intent = Intent(this@AdminRankingActivity, HistoryActivity::class.java)
                         intent.putExtra("USER_EMAIL", email)
                         startActivity(intent)
                     }
@@ -293,13 +316,24 @@ class AdminRankingActivity : AppCompatActivity() {
             }
     }
 
+    private var isToastShown = false
+
     private fun updateRankingUI() {
         rankingListLayout.removeAllViews()
-        if (rankingListItems.isNotEmpty()) firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second}"
-        if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second} "
-        if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second} "
-        val startIndex = currentPage * itemsPerPage + 3
-        val endIndex = minOf(startIndex + itemsPerPage, rankingListItems.size)
+
+        // Luôn lấy top 1, 2, 3 từ danh sách đầy đủ (rankingListItems)
+        if (rankingListItems.isNotEmpty()) {
+            firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second}"
+            if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second}"
+            if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second}"
+        }
+
+        // Xác định danh sách hiển thị dựa trên chế độ tìm kiếm
+        val itemsToDisplay = if (isSearching) searchResultsItems else rankingListItems
+        pageNumberTextView.text = "Page $currentPage"
+
+        val startIndex = currentPage * itemsPerPage + 3 // Bắt đầu từ sau top 3
+        val endIndex = minOf(startIndex + itemsPerPage, itemsToDisplay.size)
 
         for (i in startIndex until endIndex) {
             val tableRow = TableRow(this)
@@ -309,12 +343,12 @@ class AdminRankingActivity : AppCompatActivity() {
             )
 
             val playerNameTextView = TextView(this)
-            playerNameTextView.text = rankingListItems[i].first
+            playerNameTextView.text = itemsToDisplay[i].first
             playerNameTextView.setPadding(8, 8, 8, 8)
             playerNameTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
 
             val playerPointTextView = TextView(this)
-            playerPointTextView.text = rankingListItems[i].second.toString()
+            playerPointTextView.text = itemsToDisplay[i].second.toString()
             playerPointTextView.setPadding(8, 8, 8, 8)
             playerPointTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             playerPointTextView.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_END
@@ -324,7 +358,8 @@ class AdminRankingActivity : AppCompatActivity() {
 
             rankingListLayout.addView(tableRow)
         }
+
         previousPageButton.isEnabled = currentPage > 0
-        nextPageButton.isEnabled = endIndex < rankingListItems.size
+        nextPageButton.isEnabled = endIndex < itemsToDisplay.size
     }
 }

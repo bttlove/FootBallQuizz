@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -203,7 +204,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     val blockButton = Button(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
                         text = "Chặn"
-                        setOnClickListener { showBlockDialog(email) }
+                        setOnClickListener { showDeleteDialog(email) }
                     }
 
                     playerRow.addView(playerImageView)
@@ -347,7 +348,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             text = "Chặn"
             setPadding(4, 4, 4, 4)
-            setOnClickListener { showBlockDialog(email) }
+            setOnClickListener { showDeleteDialog(email) }
         }
 
         playerRow.addView(playerImageView)
@@ -359,48 +360,70 @@ class PlayerManagementAdmin : AppCompatActivity() {
     }
 
 
-    private fun showBlockDialog(email: String) {
-        val options = arrayOf("Chặn 7 ngày", "Chặn 14 ngày")
+    private fun showDeleteDialog(email: String) {
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Chọn thời gian chặn cho $email")
-        builder.setItems(options) { _, which ->
-            when (which) {
-                0 -> blockPlayer(email, 7)
-                1 -> blockPlayer(email, 14)
+        builder.setMessage("Bạn có chắc chắn muốn xóa người chơi này không?")
+            .setPositiveButton("Xóa") { dialog, id ->
+                deletePlayer(email)
             }
-        }
-        builder.show()
+            .setNegativeButton("Hủy", null)
+        builder.create().show()
     }
 
-    private fun blockPlayer(email: String, days: Int) {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, days)
-        val unblockDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+    private fun deletePlayer(email: String) {
+        db.collection("auths").whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    // Kiểm tra role của người chơi trước khi xóa
+                    val role = document.getString("role") // Giả sử role được lưu trữ dưới trường "role"
+                    if (role == "user") {
+                        // Xóa người chơi khỏi Firestore
+                        db.collection("auths").document(document.id).delete()
+                            .addOnSuccessListener {
+                                // Xóa người chơi khỏi Firebase Authentication
+                                FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
+                                    .addOnCompleteListener { task ->
+                                        if (task.isSuccessful) {
+                                            val currentUser = FirebaseAuth.getInstance().currentUser
 
-        db.collection("login").document(email)
-            .update("block_until", unblockDate)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Người chơi $email đã bị chặn trong $days ngày.", Toast.LENGTH_SHORT).show()
-                updateBlockButton(email)
+                                            // Kiểm tra email người chơi cần xóa
+                                            if (currentUser != null && currentUser.email != email) {
+                                                // Nếu không phải tài khoản đang đăng nhập, xóa tài khoản người chơi
+                                                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, "password") // Đăng nhập tạm thời bằng email và mật khẩu của người chơi
+                                                    .addOnSuccessListener {
+                                                        currentUser.delete()
+                                                            .addOnSuccessListener {
+                                                                // Người chơi đã bị xóa khỏi Firebase Authentication
+                                                                Toast.makeText(this, "Người chơi đã bị xóa khỏi Authentication và Firestore", Toast.LENGTH_SHORT).show()
+
+                                                                // Cập nhật lại danh sách người chơi (load lại dữ liệu)
+                                                                loadPlayerData() // Hoặc gọi cập nhật lại trực tiếp RecyclerView
+                                                            }
+                                                            .addOnFailureListener { e ->
+                                                                Toast.makeText(this, "Không thể xóa người chơi khỏi Authentication: $e", Toast.LENGTH_SHORT).show()
+                                                            }
+                                                    }
+                                                    .addOnFailureListener { e ->
+                                                        Toast.makeText(this, "Lỗi khi đăng nhập người chơi: $e", Toast.LENGTH_SHORT).show()
+                                                    }
+                                            }
+                                        } else {
+                                            Toast.makeText(this, "Không thể xóa người chơi khỏi Authentication: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Không thể xóa người chơi khỏi Firestore: $e", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(this, "Không thể xóa tài khoản không phải người chơi", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi khi chặn người chơi: $e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Lỗi khi tìm người chơi: $e", Toast.LENGTH_SHORT).show()
             }
-    }
-
-    private fun updateBlockButton(email: String) {
-        for (i in 0 until playerListLayout.childCount) {
-            val row = playerListLayout.getChildAt(i) as TableRow
-            val emailTextView = row.getChildAt(0) as TextView
-            val blockButton = row.getChildAt(3) as Button
-
-            if (emailTextView.text == email) {
-                blockButton.text = "Đã chặn"
-                blockButton.isEnabled = false
-                Toast.makeText(this, "$email đã bị chặn", Toast.LENGTH_SHORT).show()
-                break
-            }
-        }
     }
 
     private fun formatDateTime(dateTime: String): String {

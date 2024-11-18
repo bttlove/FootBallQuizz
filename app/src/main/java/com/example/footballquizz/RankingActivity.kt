@@ -1,4 +1,3 @@
-
 package com.example.footballquizz
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +9,8 @@ import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -52,7 +53,8 @@ class RankingActivity : AppCompatActivity() {
         nextPageButton = findViewById(R.id.nextPageButton)
         previousPageButton = findViewById(R.id.prevPageButton)
         pageNumberTextView = findViewById(R.id.pageNumberTextView)
-        
+
+
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -72,47 +74,55 @@ class RankingActivity : AppCompatActivity() {
             }
         }
 
+        val recyclerView: RecyclerView = findViewById(R.id.playersRecyclerView)
+        val playerList = mutableListOf<Pair<String, Double>>()
+        val adapter = RankingAdapter(playerList)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        loadRankingData(adapter)
+
         addPlayerRankingButton.setOnClickListener {
+            isToastShown = false
             val query = searchPlayerRankingEditText.text.toString().trim()
             if (query.isNotEmpty()) {
-                // Kích hoạt trạng thái tìm kiếm và đặt lại trang hiện tại về 0
+
                 isSearching = true
                 currentPage = 0
                 searchResultsItems.clear()
 
                 when {
                     query.contains("@") -> {
-                        searchByEmail(query) // Tìm theo email
+                        searchByEmail(query)
                     }
                     query.toDoubleOrNull() != null -> {
-                        searchByScore(query.toDouble()) // Tìm theo điểm
+                        searchByScore(query.toDouble())
                     }
                     else -> {
-                        searchByName(query) // Tìm theo tên
+                        searchByName(query)
                     }
                 }
             } else {
-                // Không có nội dung trong thanh tìm kiếm, hiển thị toàn bộ dữ liệu
                 isSearching = false
                 currentPage = 0
-                loadRankingData()
+                loadRankingData(adapter)
             }
         }
 
 
         nextPageButton.setOnClickListener {
             currentPage++
-            loadRankingData()
+            loadRankingData(adapter)
         }
 
         previousPageButton.setOnClickListener {
             if (currentPage > 0) {
                 currentPage--
-                loadRankingData()
+                loadRankingData(adapter)
             }
         }
 
-        loadRankingData()
+        loadRankingData(adapter)
     }
 
     private fun searchByEmail(email: String) {
@@ -136,8 +146,6 @@ class RankingActivity : AppCompatActivity() {
 
     private fun searchByName(name: String) {
         db.collection("score")
-            .whereGreaterThanOrEqualTo("name", name)
-            .whereLessThanOrEqualTo("name", name + '\uf8ff')
             .get()
             .addOnSuccessListener { scoreResult ->
                 for (document in scoreResult) {
@@ -145,7 +153,9 @@ class RankingActivity : AppCompatActivity() {
                     val playerPointString = document.getString("point") ?: "0"
                     val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
 
-                    searchResultsItems.add(Pair(playerName, playerPoint))
+                    if (playerName.contains(name, ignoreCase = true)) {
+                        searchResultsItems.add(Pair(playerName, playerPoint))
+                    }
                 }
                 updateRankingUI()
             }
@@ -155,36 +165,60 @@ class RankingActivity : AppCompatActivity() {
     }
 
     private fun searchByScore(score: Double) {
+        searchResultsItems.clear()
         db.collection("score")
             .get()
-            .addOnSuccessListener { scoreResult ->
-                for (document in scoreResult) {
+            .addOnSuccessListener { querySnapshot ->
+                var foundResults = false
+
+                for (document in querySnapshot) {
                     val playerName = document.getString("name") ?: "No Name"
-                    val playerPointString = document.getString("point") ?: "0"
-                    val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
+                    val pointString = document.getString("point") ?: "0"
+
+
+                    val playerPoint = try {
+                        pointString.toDouble()
+                    } catch (e: NumberFormatException) {
+                        0.0
+                    }
+
+
                     if (playerPoint == score) {
                         searchResultsItems.add(Pair(playerName, playerPoint))
+                        foundResults = true
                     }
                 }
+
+
+                isSearching = true
+                if (foundResults) {
+                    Toast.makeText(this, "Tìm thấy ${searchResultsItems.size} người chơi có điểm $score", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Không tìm thấy người chơi có điểm $score", Toast.LENGTH_SHORT).show()
+                }
+
                 updateRankingUI()
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Không tìm thấy người chơi với điểm $score: $e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Lỗi khi tìm kiếm: $e", Toast.LENGTH_SHORT).show()
             }
+
     }
 
-
-    private fun loadRankingData() {
+    private fun loadRankingData(adapter: RankingAdapter) {
         db.collection("score")
             .get()
-            .addOnSuccessListener { result ->
+            .addOnSuccessListener { querySnapshot ->
                 rankingListItems.clear()
 
-                for (document in result) {
+                for (document in querySnapshot) {
                     val playerName = document.getString("name") ?: "No Name"
-                    val playerPointString = document.getString("point") ?: "0"
-                    val playerPoint = playerPointString.toDoubleOrNull() ?: 0.0
-
+                    val pointString = document.getString("point") ?: "0"
+                    val playerPoint = try {
+                        pointString.toDouble()
+                    } catch (e: NumberFormatException) {
+                        0.0
+                    }
                     rankingListItems.add(Pair(playerName, playerPoint))
                 }
 
@@ -198,7 +232,6 @@ class RankingActivity : AppCompatActivity() {
                 Toast.makeText(this, "Failed to load ranking: $e", Toast.LENGTH_SHORT).show()
             }
     }
-
 
     private fun updateTop3PlayersWithImages() {
         for (i in 0 until minOf(3, rankingListItems.size)) {
@@ -225,6 +258,7 @@ class RankingActivity : AppCompatActivity() {
                                 }
                             }
                             .addOnFailureListener {
+
                             }
                     }
                 }
@@ -238,7 +272,8 @@ class RankingActivity : AppCompatActivity() {
             2 -> thirdPlaceName
             else -> return
         }
-        textView.text = "$playerName - $playerPoints "
+
+        textView.text = "$playerName $playerPoints "
 
         val imageView = when (index) {
             0 -> firstPlaceImage
@@ -251,13 +286,18 @@ class RankingActivity : AppCompatActivity() {
             navigateToProfile(playerName)
         }
 
-
         imageView?.setOnClickListener {
             navigateToProfile(playerName)
         }
 
+
         imageView?.let {
-            Glide.with(this).load(imageUrl).into(it)
+            Glide.with(this)
+                .load(imageUrl)
+                .circleCrop()
+                .placeholder(R.drawable.hinh1)
+                .into(it)
+
         }
     }
 
@@ -276,6 +316,8 @@ class RankingActivity : AppCompatActivity() {
                 }
             }
     }
+
+    private var isToastShown = false
 
     private fun updateRankingUI() {
         rankingListLayout.removeAllViews()
@@ -322,4 +364,5 @@ class RankingActivity : AppCompatActivity() {
         nextPageButton.isEnabled = endIndex < itemsToDisplay.size
     }
 }
+
 

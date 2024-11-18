@@ -61,5 +61,6 @@ class PlayerAdapter(
         .load(player.imageUrl)
         .into(playerImageView)
     }
+
   }
 }

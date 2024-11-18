@@ -8,7 +8,7 @@
 
 
 
-    <!-- Bottom Navigation -->
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -19,7 +19,7 @@
         app:layout_constraintVertical_bias="0.0"
         tools:layout_editor_absoluteX="0dp">
 
-        <!-- Title for Player Management -->
+
         <TextView
             android:id="@+id/player_management_title"
             android:layout_width="wrap_content"
@@ -55,7 +55,6 @@
             app:layout_constraintTop_toBottomOf="@+id/searchPlayerEditText" />
 
 
-        <!-- Table Layout for player list headers -->
         <TableLayout
             android:id="@+id/player_list"
             android:layout_width="match_parent"

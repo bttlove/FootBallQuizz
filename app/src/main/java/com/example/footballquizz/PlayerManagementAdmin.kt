@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -162,7 +161,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
 
                 playerListLayout.removeAllViews()
 
-                // Lặp qua các dữ liệu và thêm vào bảng
+
                 for ((index, document) in result.withIndex()) {
                     val email = document.getString("email") ?: "No Email"
                     val dateTime = document.getString("date-time") ?: "Unknown"
@@ -360,8 +359,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
     }
 
     private fun refreshPlayerList() {
-        // Tải lại danh sách người chơi từ Firestore
-        loadPlayerData() // Hàm loadPlayerData() đã có trong code của bạn
+
+        loadPlayerData()
     }
 
     private fun showDeleteDialog(email: String) {
@@ -400,7 +399,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
             }
     }
 
-
     private fun deletePlayerFromScore(email: String) {
         db.collection("score").whereEqualTo("e-mail", email)
             .get()
@@ -413,7 +411,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     db.collection("score").document(document.id).delete()
                         .addOnSuccessListener {
                             Toast.makeText(this, "Người chơi đã bị xóa khỏi score", Toast.LENGTH_SHORT).show()
-                            refreshPlayerList() // Cập nhật danh sách ngay lập tức
+                            refreshPlayerList()
                         }
                         .addOnFailureListener { e ->
                             Toast.makeText(this, "Lỗi khi xóa khỏi collection score: $e", Toast.LENGTH_SHORT).show()
@@ -424,8 +422,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
                 Toast.makeText(this, "Lỗi khi truy vấn collection score: $e", Toast.LENGTH_SHORT).show()
             }
     }
-
-
 
     private fun formatDateTime(dateTime: String): String {
         return try {

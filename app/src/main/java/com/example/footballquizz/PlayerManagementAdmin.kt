@@ -203,7 +203,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     }
                     val blockButton = Button(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                        text = "Chặn"
+                        text = "Xóa"
                         setOnClickListener { showDeleteDialog(email) }
                     }
 
@@ -224,6 +224,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
                 Toast.makeText(this, "Không thể tải dữ liệu người chơi: $e", Toast.LENGTH_SHORT).show()
             }
     }
+
     private fun loadNextPage() {
         lastVisible?.let {
             db.collection("auths")
@@ -292,7 +293,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
         nextPageButton.isEnabled = lastVisible != null
     }
 
-
     private fun addPlayerRow(document: DocumentSnapshot) {
         val email = document.getString("email") ?: "No Email"
         val dateTime = document.getString("date-time") ?: "Unknown"
@@ -359,6 +359,10 @@ class PlayerManagementAdmin : AppCompatActivity() {
         playerListLayout.addView(playerRow)
     }
 
+    private fun refreshPlayerList() {
+        // Tải lại danh sách người chơi từ Firestore
+        loadPlayerData() // Hàm loadPlayerData() đã có trong code của bạn
+    }
 
     private fun showDeleteDialog(email: String) {
         val builder = AlertDialog.Builder(this)
@@ -375,46 +379,16 @@ class PlayerManagementAdmin : AppCompatActivity() {
             .get()
             .addOnSuccessListener { result ->
                 for (document in result) {
-                    // Kiểm tra role của người chơi trước khi xóa
-                    val role = document.getString("role") // Giả sử role được lưu trữ dưới trường "role"
+                    val role = document.getString("role") ?: "unknown"
                     if (role == "user") {
-                        // Xóa người chơi khỏi Firestore
                         db.collection("auths").document(document.id).delete()
                             .addOnSuccessListener {
-                                // Xóa người chơi khỏi Firebase Authentication
-                                FirebaseAuth.getInstance().fetchSignInMethodsForEmail(email)
-                                    .addOnCompleteListener { task ->
-                                        if (task.isSuccessful) {
-                                            val currentUser = FirebaseAuth.getInstance().currentUser
-
-                                            // Kiểm tra email người chơi cần xóa
-                                            if (currentUser != null && currentUser.email != email) {
-                                                // Nếu không phải tài khoản đang đăng nhập, xóa tài khoản người chơi
-                                                FirebaseAuth.getInstance().signInWithEmailAndPassword(email, "password") // Đăng nhập tạm thời bằng email và mật khẩu của người chơi
-                                                    .addOnSuccessListener {
-                                                        currentUser.delete()
-                                                            .addOnSuccessListener {
-                                                                // Người chơi đã bị xóa khỏi Firebase Authentication
-                                                                Toast.makeText(this, "Người chơi đã bị xóa khỏi Authentication và Firestore", Toast.LENGTH_SHORT).show()
-
-                                                                // Cập nhật lại danh sách người chơi (load lại dữ liệu)
-                                                                loadPlayerData() // Hoặc gọi cập nhật lại trực tiếp RecyclerView
-                                                            }
-                                                            .addOnFailureListener { e ->
-                                                                Toast.makeText(this, "Không thể xóa người chơi khỏi Authentication: $e", Toast.LENGTH_SHORT).show()
-                                                            }
-                                                    }
-                                                    .addOnFailureListener { e ->
-                                                        Toast.makeText(this, "Lỗi khi đăng nhập người chơi: $e", Toast.LENGTH_SHORT).show()
-                                                    }
-                                            }
-                                        } else {
-                                            Toast.makeText(this, "Không thể xóa người chơi khỏi Authentication: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
+                                Toast.makeText(this, "Người chơi đã bị xóa khỏi auths", Toast.LENGTH_SHORT).show()
+                                deletePlayerFromScore(email)
+                                refreshPlayerList() // Cập nhật danh sách ngay lập tức
                             }
                             .addOnFailureListener { e ->
-                                Toast.makeText(this, "Không thể xóa người chơi khỏi Firestore: $e", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this, "Không thể xóa người chơi khỏi auths: $e", Toast.LENGTH_SHORT).show()
                             }
                     } else {
                         Toast.makeText(this, "Không thể xóa tài khoản không phải người chơi", Toast.LENGTH_SHORT).show()
@@ -422,9 +396,36 @@ class PlayerManagementAdmin : AppCompatActivity() {
                 }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi khi tìm người chơi: $e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Lỗi khi tìm người chơi trong auths: $e", Toast.LENGTH_SHORT).show()
             }
     }
+
+
+    private fun deletePlayerFromScore(email: String) {
+        db.collection("score").whereEqualTo("e-mail", email)
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    Toast.makeText(this, "Không tìm thấy người chơi trong collection score", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+                for (document in result) {
+                    db.collection("score").document(document.id).delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Người chơi đã bị xóa khỏi score", Toast.LENGTH_SHORT).show()
+                            refreshPlayerList() // Cập nhật danh sách ngay lập tức
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Lỗi khi xóa khỏi collection score: $e", Toast.LENGTH_SHORT).show()
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Lỗi khi truy vấn collection score: $e", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
 
     private fun formatDateTime(dateTime: String): String {
         return try {

@@ -6,28 +6,27 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.BaseAdapter
+import androidx.recyclerview.widget.RecyclerView
 
-class RankingAdapter(private val context: Context, private val dataSource: List<String>) : BaseAdapter() {
+class RankingAdapter(private val playerList: List<Pair<String, Double>>) : RecyclerView.Adapter<RankingAdapter.RankingViewHolder>() {
 
-    private val inflater: LayoutInflater = LayoutInflater.from(context)
-
-    override fun getCount(): Int {
-        return dataSource.size
+    class RankingViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val playerName: TextView = itemView.findViewById(R.id.player_name)
+        val playerPoints: TextView = itemView.findViewById(R.id.points_textview)
     }
 
-    override fun getItem(position: Int): Any {
-        return dataSource[position]
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RankingViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.activity_ranking, parent, false)
+        return RankingViewHolder(view)
     }
 
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
+    override fun onBindViewHolder(holder: RankingViewHolder, position: Int) {
+        val player = playerList[position]
+        holder.playerName.text = player.first
+        holder.playerPoints.text = player.second.toString()
     }
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val rowView = convertView ?: inflater.inflate(android.R.layout.simple_list_item_1, parent, false)
-        val playerTextView = rowView.findViewById<TextView>(android.R.id.text1)
-
-        playerTextView.text = getItem(position) as String
-        return rowView
+    override fun getItemCount(): Int {
+        return playerList.size
     }
 }

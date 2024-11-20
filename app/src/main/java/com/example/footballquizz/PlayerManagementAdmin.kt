@@ -161,7 +161,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
 
                 playerListLayout.removeAllViews()
 
-                // Lặp qua các dữ liệu và thêm vào bảng
+
                 for ((index, document) in result.withIndex()) {
                     val email = document.getString("email") ?: "No Email"
                     val dateTime = document.getString("date-time") ?: "Unknown"
@@ -202,8 +202,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
                     }
                     val blockButton = Button(this).apply {
                         layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-                        text = "Chặn"
-                        setOnClickListener { showBlockDialog(email) }
+                        text = "Xóa"
+                        setOnClickListener { showDeleteDialog(email) }
                     }
 
                     playerRow.addView(playerImageView)
@@ -223,6 +223,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
                 Toast.makeText(this, "Không thể tải dữ liệu người chơi: $e", Toast.LENGTH_SHORT).show()
             }
     }
+
     private fun loadNextPage() {
         lastVisible?.let {
             db.collection("auths")
@@ -291,7 +292,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
         nextPageButton.isEnabled = lastVisible != null
     }
 
-
     private fun addPlayerRow(document: DocumentSnapshot) {
         val email = document.getString("email") ?: "No Email"
         val dateTime = document.getString("date-time") ?: "Unknown"
@@ -347,7 +347,7 @@ class PlayerManagementAdmin : AppCompatActivity() {
             layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             text = "Chặn"
             setPadding(4, 4, 4, 4)
-            setOnClickListener { showBlockDialog(email) }
+            setOnClickListener { showDeleteDialog(email) }
         }
 
         playerRow.addView(playerImageView)
@@ -358,49 +358,69 @@ class PlayerManagementAdmin : AppCompatActivity() {
         playerListLayout.addView(playerRow)
     }
 
+    private fun refreshPlayerList() {
 
-    private fun showBlockDialog(email: String) {
-        val options = arrayOf("Chặn 7 ngày", "Chặn 14 ngày")
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Chọn thời gian chặn cho $email")
-        builder.setItems(options) { _, which ->
-            when (which) {
-                0 -> blockPlayer(email, 7)
-                1 -> blockPlayer(email, 14)
-            }
-        }
-        builder.show()
+        loadPlayerData()
     }
 
-    private fun blockPlayer(email: String, days: Int) {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, days)
-        val unblockDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
+    private fun showDeleteDialog(email: String) {
+        val builder = AlertDialog.Builder(this)
+        builder.setMessage("Bạn có chắc chắn muốn xóa người chơi này không?")
+            .setPositiveButton("Xóa") { dialog, id ->
+                deletePlayer(email)
+            }
+            .setNegativeButton("Hủy", null)
+        builder.create().show()
+    }
 
-        db.collection("login").document(email)
-            .update("block_until", unblockDate)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Người chơi $email đã bị chặn trong $days ngày.", Toast.LENGTH_SHORT).show()
-                updateBlockButton(email)
+    private fun deletePlayer(email: String) {
+        db.collection("auths").whereEqualTo("email", email)
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    val role = document.getString("role") ?: "unknown"
+                    if (role == "user") {
+                        db.collection("auths").document(document.id).delete()
+                            .addOnSuccessListener {
+                                Toast.makeText(this, "Người chơi đã bị xóa khỏi auths", Toast.LENGTH_SHORT).show()
+                                deletePlayerFromScore(email)
+                                refreshPlayerList() // Cập nhật danh sách ngay lập tức
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Không thể xóa người chơi khỏi auths: $e", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(this, "Không thể xóa tài khoản không phải người chơi", Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi khi chặn người chơi: $e", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Lỗi khi tìm người chơi trong auths: $e", Toast.LENGTH_SHORT).show()
             }
     }
 
-    private fun updateBlockButton(email: String) {
-        for (i in 0 until playerListLayout.childCount) {
-            val row = playerListLayout.getChildAt(i) as TableRow
-            val emailTextView = row.getChildAt(0) as TextView
-            val blockButton = row.getChildAt(3) as Button
-
-            if (emailTextView.text == email) {
-                blockButton.text = "Đã chặn"
-                blockButton.isEnabled = false
-                Toast.makeText(this, "$email đã bị chặn", Toast.LENGTH_SHORT).show()
-                break
+    private fun deletePlayerFromScore(email: String) {
+        db.collection("score").whereEqualTo("e-mail", email)
+            .get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    Toast.makeText(this, "Không tìm thấy người chơi trong collection score", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+                for (document in result) {
+                    db.collection("score").document(document.id).delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(this, "Người chơi đã bị xóa khỏi score", Toast.LENGTH_SHORT).show()
+                            refreshPlayerList()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(this, "Lỗi khi xóa khỏi collection score: $e", Toast.LENGTH_SHORT).show()
+                        }
+                }
             }
-        }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Lỗi khi truy vấn collection score: $e", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun formatDateTime(dateTime: String): String {

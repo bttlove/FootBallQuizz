@@ -52,7 +52,9 @@
                         android:layout_height="90dp"
                         android:src="@drawable/hinh1"
                         android:scaleType="centerCrop"
-                        android:layout_gravity="center" />
+                        android:layout_gravity="center"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background" />
                     <TextView
                         android:id="@+id/first_place_name"
                         android:layout_width="wrap_content"
@@ -76,7 +78,9 @@
                         android:layout_height="64dp"
                         android:src="@drawable/hinh2"
                         android:scaleType="centerCrop"
-                        android:layout_gravity="center" />
+                        android:layout_gravity="center"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background" />/>
                     <TextView
                         android:id="@+id/second_place_name"
                         android:layout_width="wrap_content"
@@ -100,7 +104,9 @@
                         android:layout_height="48dp"
                         android:src="@drawable/hinh3"
                         android:scaleType="centerCrop"
-                        android:layout_gravity="center" />
+                        android:layout_gravity="center"
+                        android:clipToOutline="true"
+                        android:outlineProvider="background" />/>
                     <TextView
                         android:id="@+id/third_place_name"
                         android:layout_width="wrap_content"

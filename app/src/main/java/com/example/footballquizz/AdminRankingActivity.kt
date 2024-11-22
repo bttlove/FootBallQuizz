@@ -321,18 +321,19 @@ class AdminRankingActivity : AppCompatActivity() {
     private fun updateRankingUI() {
         rankingListLayout.removeAllViews()
 
-        // Luôn lấy top 1, 2, 3 từ danh sách đầy đủ (rankingListItems)
+        // Cập nhật Top 1, 2, 3
         if (rankingListItems.isNotEmpty()) {
             firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second}"
             if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second}"
             if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second}"
         }
 
-        // Xác định danh sách hiển thị dựa trên chế độ tìm kiếm
+        // Lấy danh sách hiển thị
         val itemsToDisplay = if (isSearching) searchResultsItems else rankingListItems
         pageNumberTextView.text = "Page $currentPage"
 
-        val startIndex = currentPage * itemsPerPage + 3 // Bắt đầu từ sau top 3
+        // Bắt đầu từ vị trí sau top 3
+        val startIndex = currentPage * itemsPerPage + 3 // Top 3 đã hiển thị trước
         val endIndex = minOf(startIndex + itemsPerPage, itemsToDisplay.size)
 
         for (i in startIndex until endIndex) {
@@ -342,23 +343,36 @@ class AdminRankingActivity : AppCompatActivity() {
                 TableRow.LayoutParams.WRAP_CONTENT
             )
 
+            // Thêm cột Rank
+            val rankTextView = TextView(this)
+            rankTextView.text = (i + 1).toString() // Rank = index + 1 (do danh sách bắt đầu từ 0)
+            rankTextView.setPadding(8, 8, 8, 8)
+            rankTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+            rankTextView.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+
+            // Tên người chơi
             val playerNameTextView = TextView(this)
             playerNameTextView.text = itemsToDisplay[i].first
             playerNameTextView.setPadding(8, 8, 8, 8)
             playerNameTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
 
+            // Điểm của người chơi
             val playerPointTextView = TextView(this)
             playerPointTextView.text = itemsToDisplay[i].second.toString()
             playerPointTextView.setPadding(8, 8, 8, 8)
             playerPointTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             playerPointTextView.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_END
 
+            // Thêm các View vào TableRow
+            tableRow.addView(rankTextView)
             tableRow.addView(playerNameTextView)
             tableRow.addView(playerPointTextView)
 
+            // Thêm TableRow vào layout danh sách
             rankingListLayout.addView(tableRow)
         }
 
+        // Cập nhật trạng thái nút Previous và Next
         previousPageButton.isEnabled = currentPage > 0
         nextPageButton.isEnabled = endIndex < itemsToDisplay.size
     }

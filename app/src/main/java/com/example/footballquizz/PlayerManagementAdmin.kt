@@ -6,8 +6,10 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
@@ -22,7 +24,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class PlayerManagementAdmin : AppCompatActivity() {
-
+    private lateinit var btnSort: ImageButton
     private lateinit var searchPlayerManagementEditText: EditText
     private lateinit var addPlayerManagementButton: Button
     private lateinit var playerListLayout: LinearLayout
@@ -34,6 +36,8 @@ class PlayerManagementAdmin : AppCompatActivity() {
     private var lastVisible: DocumentSnapshot? = null
     private var firstVisible: DocumentSnapshot? = null
     private val pageSize = 10
+    private var sortAscending = true
+    private var currentSortField = "name"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +49,27 @@ class PlayerManagementAdmin : AppCompatActivity() {
         nextPageButton = findViewById(R.id.nextPageButton)
         prevPageButton = findViewById(R.id.prevPageButton)
         pageNumberTextView = findViewById(R.id.pageNumberTextView)
+        btnSort = findViewById(R.id.btnSort)
+
+        btnSort.setOnClickListener {
+            val popupMenu = PopupMenu(this, btnSort)
+            popupMenu.menuInflater.inflate(R.menu.menu_playermanagement, popupMenu.menu)
+
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.sort_alphabetical_playerManagementAdmin-> {
+                        currentSortField = "name"
+                        sortPlayerData("email")
+                    }
+                    R.id.sort_by_date__playerManagementAdmin -> {
+                        currentSortField = "date-time"
+                        sortPlayerData("date-time")
+                    }
+                }
+                true
+            }
+            popupMenu.show()
+        }
 
         val bottomNavigation: BottomNavigationView = findViewById(R.id.admin_bottom_navigation)
         bottomNavigation.setOnItemSelectedListener { item ->
@@ -95,6 +120,89 @@ class PlayerManagementAdmin : AppCompatActivity() {
         loadPlayerData()
     }
 
+    private fun sortPlayerData(field: String) {
+        val query = db.collection("auths")
+            .orderBy(field, if (sortAscending) Query.Direction.ASCENDING else Query.Direction.DESCENDING)
+            .limit(pageSize.toLong())
+
+        if (lastVisible != null) {
+            query.startAfter(lastVisible)
+        }
+
+        query.get()
+            .addOnSuccessListener { result ->
+                if (result.isEmpty) {
+                    nextPageButton.isEnabled = false
+                    return@addOnSuccessListener
+                }
+
+                playerListLayout.removeAllViews()
+
+                for ((index, document) in result.withIndex()) {
+                    val email = document.getString("email") ?: "No Email"
+                    val dateTime = document.getString("date-time") ?: "Unknown"
+                    val imageUrl = document.getString("image_url") ?: ""
+                    val formattedDateTime = formatDateTime(dateTime)
+                    val playerRow = TableRow(this)
+
+                    val playerImageView = ImageView(this).apply {
+                        layoutParams = TableRow.LayoutParams(0, 150, 1f)
+                        scaleType = ImageView.ScaleType.CENTER_CROP
+                        adjustViewBounds = true
+
+                        if (imageUrl.isNotEmpty()) {
+                            val requestOptions = RequestOptions().circleCrop().override(150, 150)
+                            Glide.with(this@PlayerManagementAdmin).load(imageUrl).apply(requestOptions).into(this)
+                        }
+                        setOnClickListener {
+                            val intent = Intent(this@PlayerManagementAdmin, Profile_AdminActivity::class.java)
+                            intent.putExtra("USER_EMAIL", email)
+                            startActivity(intent)
+                        }
+                    }
+
+                    val emailTextView = TextView(this).apply {
+                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                        text = email
+                        textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                        setOnClickListener {
+                            val intent = Intent(this@PlayerManagementAdmin, Profile_AdminActivity::class.java)
+                            intent.putExtra("USER_EMAIL", email)
+                            startActivity(intent)
+                        }
+                    }
+                    val dateTimeTextView = TextView(this).apply {
+                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                        text = formattedDateTime
+                        textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+                    }
+                    val blockButton = Button(this).apply {
+                        layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
+                        text = "Xóa"
+                        setOnClickListener { showDeleteDialog(email) }
+                    }
+
+                    playerRow.addView(playerImageView)
+                    playerRow.addView(emailTextView)
+                    playerRow.addView(dateTimeTextView)
+                    playerRow.addView(blockButton)
+                    playerListLayout.addView(playerRow)
+                    if (index == result.size() - 1) {
+                        lastVisible = document
+                    }
+                }
+
+                prevPageButton.isEnabled = currentPage > 1
+                nextPageButton.isEnabled = result.size() == pageSize
+
+                // Đổi trạng thái sortAscending
+                sortAscending = !sortAscending
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Không thể tải dữ liệu người chơi: $e", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     private fun searchPlayerByEmail(email: String) {
         db.collection("auths")
             .whereEqualTo("email", email)
@@ -120,24 +228,38 @@ class PlayerManagementAdmin : AppCompatActivity() {
             }
     }
 
-    private fun dynamicSearchPlayerByEmail(email: String) {
+    private fun dynamicSearchPlayerByEmail(keyword: String) {
+        if (keyword.isEmpty()) {
+            // Nếu không có từ khóa, không thực hiện tìm kiếm
+            Toast.makeText(this, "Vui lòng nhập từ khóa để tìm kiếm", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         db.collection("auths")
-            .orderBy("email")
-            .startAt(email)
-            .endAt(email + "\uf8ff")
-            .limit(pageSize.toLong())
             .get()
             .addOnSuccessListener { result ->
-                playerListLayout.removeAllViews()
+                playerListLayout.removeAllViews() // Xóa toàn bộ dữ liệu trước khi thêm mới
 
-                if (result.isEmpty) {
-                    Toast.makeText(this, "Không tìm thấy người chơi với email chứa '$email'", Toast.LENGTH_SHORT).show()
+                // Lọc kết quả chứa từ khóa bất kỳ trong email
+                val filteredResults = result.documents.filter { document ->
+                    val email = document.getString("email") ?: ""
+                    email.contains(keyword, ignoreCase = true) // So khớp email với keyword
+                }
+
+                if (filteredResults.isEmpty()) {
+                    Toast.makeText(this, "Không tìm thấy người chơi có chứa từ '$keyword'", Toast.LENGTH_SHORT).show()
                     return@addOnSuccessListener
                 }
 
-                for (document in result) {
+                // Hiển thị kết quả tìm kiếm
+                for (document in filteredResults) {
                     addPlayerRow(document)
                 }
+
+                // Tùy chỉnh giao diện: Vô hiệu hóa phân trang khi tìm kiếm
+                prevPageButton.isEnabled = false
+                nextPageButton.isEnabled = false
+                pageNumberTextView.text = "Kết quả tìm kiếm"
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Lỗi khi tìm kiếm động: $e", Toast.LENGTH_SHORT).show()

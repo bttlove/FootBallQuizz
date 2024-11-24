@@ -39,9 +39,10 @@ class HistoryAdapter(context: Context, private val historyList: MutableList<Scor
     // Set color for difficulty based on its value
     when (item?.difficulty) {
       "easy" -> tvDifficulty.setTextColor(Color.GREEN)
-      "medium" -> tvDifficulty.setTextColor(Color.YELLOW)
+      "medium" -> tvDifficulty.setTextColor(Color.parseColor("#DEAA06"))
       "hard" -> tvDifficulty.setTextColor(Color.RED)
       "random" -> tvDifficulty.setTextColor(Color.MAGENTA)
+      "VeryHard" -> tvDifficulty.setTextColor(Color.parseColor("#6B4226"))
       else -> tvDifficulty.setTextColor(Color.BLACK)
     }
 

@@ -1,0 +1,8 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/sort_alphabetical_Ranking"
+        android:title="Tên" />
+    <item
+        android:id="@+id/sort_by_point_Ranking"
+        android:title="Điểm" />
+</menu>

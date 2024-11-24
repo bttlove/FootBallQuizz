@@ -6,9 +6,6 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -31,17 +28,31 @@
             android:textSize="32sp"
             android:textStyle="bold" />
 
-
-        <EditText
-            android:id="@+id/searchPlayerManagementEditText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Tìm kiếm Người Chơi"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/searchPlayerManagementEditText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:drawablePadding="10dp"
+                android:hint="Tìm kiếm Người Chơi"
+                android:padding="10dp" />
+
+
+            <ImageButton
+                android:id="@+id/btnSort"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="Sắp xếp"
+                android:src="@drawable/ic_sort"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/textViewTitle" />
+        </LinearLayout>
 
         <Button
             android:id="@+id/addPlayerManagementButton"
@@ -115,8 +126,8 @@
             android:layout_height="0dp"
             android:layout_marginTop="0dp"
             android:layout_weight="0"
-            android:textColor="@color/black"
-            android:background="@color/white" />
+            android:background="@color/white"
+            android:textColor="@color/black" />
 
         <TextView
             android:id="@+id/pageNumberTextView"

@@ -59,7 +59,9 @@ dependencies {
   testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
-    implementation ("com.google.android.material:material:1.9.0")
+  implementation ("com.google.android.gms:play-services-auth:20.7.0")
+
+  implementation ("com.google.android.material:material:1.9.0")
     implementation (libs.androidx.appcompat.v131)
     implementation ("androidx.core:core-ktx:1.12.0")
     implementation ("com.github.bumptech.glide:glide:4.12.0")
@@ -68,5 +70,8 @@ dependencies {
     kapt("com.github.bumptech.glide:compiler:4.12.0")
     implementation ("com.squareup.picasso:picasso:2.71828")
     implementation ("com.google.firebase:firebase-storage")
+  implementation ("com.google.firebase:firebase-auth:21.0.0")
+  implementation ("com.google.firebase:firebase-firestore:24.0.0")
+  implementation ("com.google.firebase:firebase-analytics:21.0.0")
 
 }

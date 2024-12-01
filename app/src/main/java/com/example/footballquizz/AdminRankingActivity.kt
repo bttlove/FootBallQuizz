@@ -1,10 +1,13 @@
 package com.example.footballquizz
 import android.content.Intent
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.PopupMenu
 import android.widget.TableRow
 import android.widget.TextView
 import android.widget.Toast
@@ -17,6 +20,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class AdminRankingActivity : AppCompatActivity() {
 
+    private lateinit var btnSort: ImageButton
     private lateinit var searchPlayerRankingAdminEditText: EditText
     private lateinit var addPlayerRankingAdminButton: Button
     private lateinit var firstPlaceName: TextView
@@ -35,6 +39,9 @@ class AdminRankingActivity : AppCompatActivity() {
     private lateinit var pageNumberTextView: TextView
     private var searchResultsItems: MutableList<Pair<String, Double>> = mutableListOf() // Lưu trữ kết quả tìm kiếm
     private var isSearching = false
+    private var sortAscending = true
+    private var currentSortField = "name"
+    private var isSorting = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +59,7 @@ class AdminRankingActivity : AppCompatActivity() {
         nextPageButton = findViewById(R.id.nextPageButton)
         previousPageButton = findViewById(R.id.prevPageButton)
         pageNumberTextView = findViewById(R.id.pageNumberTextView)
+        btnSort = findViewById(R.id.btnSort)
 
         val bottomNavigation: BottomNavigationView = findViewById(R.id.bottom_navigation_admin)
         bottomNavigation.setOnItemSelectedListener { item ->
@@ -81,11 +89,32 @@ class AdminRankingActivity : AppCompatActivity() {
         loadRankingData(adapter)
 
 
+        btnSort.setOnClickListener {
+            val popupMenu = PopupMenu(this, btnSort)
+            popupMenu.menuInflater.inflate(R.menu.menu_ranking, popupMenu.menu)
+
+            popupMenu.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.sort_alphabetical_Ranking-> {
+                        currentSortField = "name"
+                        sortPlayerData("name")
+                    }
+                    R.id.sort_by_point_Ranking -> {
+                        currentSortField = "point"
+                        sortPlayerData("point")
+                    }
+                }
+                true
+            }
+            popupMenu.show()
+        }
+
         addPlayerRankingAdminButton.setOnClickListener {
             isToastShown = false
             val query = searchPlayerRankingAdminEditText.text.toString().trim()
             if (query.isNotEmpty()) {
-
+                // Tắt chế độ tìm kiếm và sắp xếp
+                isSorting = false
                 isSearching = true
                 currentPage = 0
                 searchResultsItems.clear()
@@ -102,21 +131,29 @@ class AdminRankingActivity : AppCompatActivity() {
                     }
                 }
             } else {
+                // Reset chế độ sắp xếp và tìm kiếm
+                isSorting = false
                 isSearching = false
                 currentPage = 0
-                loadRankingData(adapter)
+                rankingListItems = rankingListItems.sortedByDescending { it.second }.toMutableList()
+                updateRankingUI()
+
             }
         }
 
+
+
         nextPageButton.setOnClickListener {
-            currentPage++
-            loadRankingData(adapter)
+            if (currentPage < (if (isSearching) searchResultsItems else rankingListItems).size / itemsPerPage) {
+                currentPage++
+                updateRankingUI()
+            }
         }
 
         previousPageButton.setOnClickListener {
             if (currentPage > 0) {
                 currentPage--
-                loadRankingData(adapter)
+                updateRankingUI()
             }
         }
 
@@ -316,6 +353,69 @@ class AdminRankingActivity : AppCompatActivity() {
             }
     }
 
+    private fun sortPlayerData(sortField: String) {
+        isSorting = true
+
+        // Tách Top 1, 2, 3 ra khỏi danh sách
+        val topThree = if (rankingListItems.size > 3) rankingListItems.take(3) else rankingListItems
+        val restOfList = if (rankingListItems.size > 3) rankingListItems.drop(3) else listOf<Pair<String, Double>>()
+
+        // Thực hiện sắp xếp cho phần còn lại
+        when (sortField) {
+            "name" -> {
+                if (sortAscending) {
+                    rankingListItems = restOfList.sortedWith { p1, p2 ->
+                        val name1 = p1.first
+                        val name2 = p2.first
+                        val isName1Digit = name1[0].isDigit()
+                        val isName2Digit = name2[0].isDigit()
+
+                        when {
+                            isName1Digit && !isName2Digit -> 1
+                            !isName1Digit && isName2Digit -> -1
+                            else -> name1.lowercase().compareTo(name2.lowercase())
+                        }
+                    }.toMutableList()
+                } else {
+                    rankingListItems = restOfList.sortedWith { p1, p2 ->
+                        val name1 = p1.first
+                        val name2 = p2.first
+                        val isName1Digit = name1[0].isDigit()
+                        val isName2Digit = name2[0].isDigit()
+
+                        when {
+                            isName1Digit && !isName2Digit -> 1
+                            !isName1Digit && isName2Digit -> -1
+                            else -> name2.lowercase().compareTo(name1.lowercase())
+                        }
+                    }.toMutableList()
+                }
+            }
+            "point" -> {
+                if (sortAscending) {
+                    rankingListItems = restOfList.sortedBy { it.second }.toMutableList()
+                } else {
+                    rankingListItems = restOfList.sortedByDescending { it.second }.toMutableList()
+                }
+            }
+        }
+
+        // Đưa lại Top 1, 2, 3 vào đầu danh sách
+        rankingListItems = (topThree + rankingListItems).toMutableList()
+
+        // Đánh dấu lại trạng thái sắp xếp
+        isSorting = true
+
+        // Reset currentPage về 0
+        currentPage = 0
+
+        // Cập nhật lại UI sau khi sắp xếp
+        updateRankingUI()
+
+        // Đổi trạng thái sắp xếp tăng/giảm
+        sortAscending = !sortAscending
+    }
+
     private var isToastShown = false
 
     private fun updateRankingUI() {
@@ -328,37 +428,46 @@ class AdminRankingActivity : AppCompatActivity() {
             if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second}"
         }
 
-        // Lấy danh sách hiển thị
+        // Lấy danh sách hiển thị (dùng search nếu đang tìm kiếm)
         val itemsToDisplay = if (isSearching) searchResultsItems else rankingListItems
-        pageNumberTextView.text = "Page $currentPage"
 
-        // Bắt đầu từ vị trí sau top 3
-        val startIndex = currentPage * itemsPerPage + 3 // Top 3 đã hiển thị trước
+        // Cập nhật số trang
+        pageNumberTextView.text = "Page ${currentPage + 1}"
+
+        // Tính toán giới hạn hiển thị trên trang
+        val startIndex = currentPage * itemsPerPage + if (!isSearching) 3 else 0
         val endIndex = minOf(startIndex + itemsPerPage, itemsToDisplay.size)
 
-        for (i in startIndex until endIndex) {
+        // Đặt lại globalRank nếu đang sắp xếp
+        val globalRankStart = if (isSorting) 1 else startIndex + 1
+
+        // Lặp qua các item để hiển thị trong trang hiện tại
+        val adjustedItems = itemsToDisplay.subList(startIndex, endIndex)
+        for ((index, item) in adjustedItems.withIndex()) {
             val tableRow = TableRow(this)
             tableRow.layoutParams = TableRow.LayoutParams(
                 TableRow.LayoutParams.MATCH_PARENT,
                 TableRow.LayoutParams.WRAP_CONTENT
             )
 
-            // Thêm cột Rank
+            // Số thứ tự toàn cục
+            val globalRank = globalRankStart + index
             val rankTextView = TextView(this)
-            rankTextView.text = (i + 1).toString() // Rank = index + 1 (do danh sách bắt đầu từ 0)
+            rankTextView.text = globalRank.toString()
             rankTextView.setPadding(8, 8, 8, 8)
             rankTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
-            rankTextView.textAlignment = TextView.TEXT_ALIGNMENT_CENTER
+            rankTextView.textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
+            rankTextView.gravity = Gravity.START
 
             // Tên người chơi
             val playerNameTextView = TextView(this)
-            playerNameTextView.text = itemsToDisplay[i].first
+            playerNameTextView.text = item.first
             playerNameTextView.setPadding(8, 8, 8, 8)
             playerNameTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
 
             // Điểm của người chơi
             val playerPointTextView = TextView(this)
-            playerPointTextView.text = itemsToDisplay[i].second.toString()
+            playerPointTextView.text = item.second.toString()
             playerPointTextView.setPadding(8, 8, 8, 8)
             playerPointTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             playerPointTextView.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_END

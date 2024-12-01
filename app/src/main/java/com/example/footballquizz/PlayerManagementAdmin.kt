@@ -309,7 +309,6 @@ class PlayerManagementAdmin : AppCompatActivity() {
     playerListLayout.addView(playerRow)
   }
 
-
   private fun showBanDialog(email: String) {
     AlertDialog.Builder(this)
       .setMessage("Bạn có chắc chắn muốn cấm người chơi này không?")

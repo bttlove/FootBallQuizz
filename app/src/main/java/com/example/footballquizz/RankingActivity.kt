@@ -429,32 +429,27 @@ class RankingActivity : AppCompatActivity() {
         sortAscending = !sortAscending
     }
 
+    private fun getRealRank(player: Pair<String, Double>): Int {
+        return rankingListItems.indexOf(player) + 1 // Tìm vị trí và cộng 1 (thứ hạng bắt đầu từ 1)
+    }
+
     private var isToastShown = false
 
     private fun updateRankingUI() {
         rankingListLayout.removeAllViews()
-
-        // Cập nhật Top 1, 2, 3
         if (rankingListItems.isNotEmpty()) {
             firstPlaceName.text = "${rankingListItems[0].first} - ${rankingListItems[0].second}"
             if (rankingListItems.size > 1) secondPlaceName.text = "${rankingListItems[1].first} - ${rankingListItems[1].second}"
             if (rankingListItems.size > 2) thirdPlaceName.text = "${rankingListItems[2].first} - ${rankingListItems[2].second}"
         }
 
-        // Lấy danh sách hiển thị (dùng search nếu đang tìm kiếm)
         val itemsToDisplay = if (isSearching) searchResultsItems else rankingListItems
 
-        // Cập nhật số trang
         pageNumberTextView.text = "Page ${currentPage + 1}"
 
-        // Tính toán giới hạn hiển thị trên trang
         val startIndex = currentPage * itemsPerPage + if (!isSearching) 3 else 0
         val endIndex = minOf(startIndex + itemsPerPage, itemsToDisplay.size)
 
-        // Đặt lại globalRank nếu đang sắp xếp
-        val globalRankStart = if (isSorting) 1 else startIndex + 1
-
-        // Lặp qua các item để hiển thị trong trang hiện tại
         val adjustedItems = itemsToDisplay.subList(startIndex, endIndex)
         for ((index, item) in adjustedItems.withIndex()) {
             val tableRow = TableRow(this)
@@ -463,38 +458,40 @@ class RankingActivity : AppCompatActivity() {
                 TableRow.LayoutParams.WRAP_CONTENT
             )
 
-            // Số thứ tự toàn cục
-            val globalRank = globalRankStart + index
+            // Tính globalRank dựa trên trạng thái isSorting
+            val globalRank = if (isSorting) index + 1 + currentPage * itemsPerPage else startIndex + index + 1
+
+            val actualRank = if (isSearching) {
+                getRealRank(item) // Lấy thứ hạng thực tế của người chơi
+            } else {
+                globalRank // Nếu không tìm kiếm, sử dụng thứ hạng tính toán dựa trên phân trang
+            }
+
             val rankTextView = TextView(this)
-            rankTextView.text = globalRank.toString()
+            rankTextView.text = actualRank.toString()
             rankTextView.setPadding(8, 8, 8, 8)
             rankTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             rankTextView.textAlignment = TextView.TEXT_ALIGNMENT_VIEW_START
             rankTextView.gravity = Gravity.START
 
-            // Tên người chơi
             val playerNameTextView = TextView(this)
             playerNameTextView.text = item.first
             playerNameTextView.setPadding(8, 8, 8, 8)
             playerNameTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
 
-            // Điểm của người chơi
             val playerPointTextView = TextView(this)
             playerPointTextView.text = item.second.toString()
             playerPointTextView.setPadding(8, 8, 8, 8)
             playerPointTextView.layoutParams = TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1f)
             playerPointTextView.textAlignment = TextView.TEXT_ALIGNMENT_TEXT_END
 
-            // Thêm các View vào TableRow
             tableRow.addView(rankTextView)
             tableRow.addView(playerNameTextView)
             tableRow.addView(playerPointTextView)
 
-            // Thêm TableRow vào layout danh sách
             rankingListLayout.addView(tableRow)
         }
 
-        // Cập nhật trạng thái nút Previous và Next
         previousPageButton.isEnabled = currentPage > 0
         nextPageButton.isEnabled = endIndex < itemsToDisplay.size
     }
